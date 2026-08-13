@@ -1,0 +1,56 @@
+Module 1 (P1M1) — Comprehensive SQL Foundation Document1. Core Mental Models & Logical Execution OrderSQL code is written declaratively, but database engines execute it imperatively in a strict sequence. Understanding this execution order is essential for preventing reference bugs and syntax errors.Execution Order vs. Lexical Order$$\text{FROM} \longrightarrow \text{WHERE} \longrightarrow \text{GROUP BY} \longrightarrow \text{HAVING} \longrightarrow \text{SELECT} \longrightarrow \text{DISTINCT} \longrightarrow \text{ORDER BY} \longrightarrow \text{LIMIT}$$[Written Order]                      [Execution Order]
+1. SELECT                            1. FROM         (Source table identified)
+2. FROM                              2. WHERE        (Filters raw individual rows)
+3. WHERE                             3. GROUP BY     (Collapses rows into groups)
+4. GROUP BY                          4. HAVING       (Filters grouped summaries)
+5. HAVING                            5. SELECT       (Evaluates columns/expressions & aliases)
+6. ORDER BY                          6. DISTINCT     (Removes duplicate output rows)
+7. LIMIT                             7. ORDER BY     (Sorts final result set)
+                                     8. LIMIT        (Cuts result count)
+Critical Rules Derived from Execution OrderColumn Aliases in WHERE are Invalid:The WHERE clause executes before SELECT. You cannot use an alias defined in SELECT within a WHERE filter.Aggregates in WHERE are Invalid:WHERE runs before GROUP BY. Aggregations (e.g., COUNT(*), AVG()) do not exist at the WHERE step. Use HAVING instead.Column Aliases in ORDER BY are Valid:ORDER BY runs after SELECT. Calculated aliases defined in SELECT can be safely used in ORDER BY.2. The 4-Step Brainstorm ChecklistBefore writing any SQL query, process it through this four-point framework:What is the Grain?Question: "One row per what in the final result set?"Purpose: Prevents fan-out errors, dictates GROUP BY requirements, and ensures output alignment with business logic.How are NULL Values Handled?Question: "Are missing/unknown values present, and what fallback or classification is required?"Purpose: Prevents subtle logic bugs using appropriate constructs (COALESCE, IS NULL, CASE WHEN).Is "Top N" Implied?Question: "What is the primary sort column, and what secondary column breaks ties deterministically?"Purpose: Ensures non-deterministic queries with LIMIT do not return arbitrary results across execution runs.Is DISTINCT Required?Question: "Is DISTINCT fulfilling a real deduplication need, or masking an unhandled join fan-out bug?"Purpose: Avoids using DISTINCT as a patch for improper join conditions or missing EXISTS clauses.3. Key Concepts, Pitfalls, & MechanicsNULL MechanicsNULL represents unknown data, not zero (0) or an empty string ('').Equality checks with NULL using standard operators (= or !=) evaluate to UNKNOWN (failing WHERE filters). Use IS NULL or IS NOT NULL.Aggregate functions (SUM, AVG, COUNT(column)) ignore NULL values. COUNT(*) counts all rows regardless of NULL presence.COALESCE vs. CASE WHENCOALESCE(col1, col2, 'fallback'): Evaluates arguments sequentially left-to-right and returns the first non-null value. Best for basic missing-value fallback logic.CASE WHEN condition THEN result ... ELSE fallback END: Evaluates multi-branch boolean logic and ranges.When NOT to use COALESCE: Avoid COALESCE on Primary Keys or guaranteed NOT NULL columns (adds unnecessary runtime overhead). Do not use COALESCE when coercing NULL to 0 obscures the distinction between "missing/unrecorded" and "zero value."PostgreSQL Default Sorting BehaviorORDER BY col ASC $\$rightarrow NULLS LAST (by default).ORDER BY col DESC $\$rightarrow NULLS FIRST (by default).To force NULL values to the bottom during descending sorts, explicitly append: ORDER BY col DESC NULLS LAST.4. Complete Practice Problems & Solutions (Q1 – Q5)Q1 · Easy: Active Students Contact ListRequirement: List all active students. Display name, dept_id, and contact (email $\rightarrow$ phone $\rightarrow$ 'no contact'). Sort by enrollment_date descending.Grain: 1 row per active student.Key Concept: COALESCE for cascading fallback handling.SQLSELECT 
+    name, 
+    dept_id, 
+    COALESCE(email, phone, 'no contact') AS contact
+FROM students
+WHERE status = 'active'
+ORDER BY enrollment_date DESC;
+Q2 · Easy: Top 3 Students by GPARequirement: Retrieve top 3 students by GPA with name, gpa, and status. Break ties using earliest enrollment_date.Grain: Top 3 individual student records overall.Key Concept: Deterministic tie-breaking using multi-column ORDER BY.SQLSELECT 
+    name, 
+    gpa, 
+    status
+FROM students
+ORDER BY 
+    gpa DESC, 
+    enrollment_date ASC
+LIMIT 3;
+Loophole / Trap: Omitting ORDER BY while keeping LIMIT 3 makes results non-deterministic. The database engine returns whichever 3 records are read first from memory/disk pages, leading to flaky test case failures.Q3 · Medium: Unique Departments with StudentsRequirement: List all distinct dept_id values present in the students table without joining.Grain: 1 row per unique department present in students.Key Concept: DISTINCT vs. GROUP BY.SQL-- Method A: Clean and Direct
+SELECT DISTINCT dept_id 
+FROM students;
+
+-- Method B: Extensible for aggregate metric additions
+SELECT dept_id 
+FROM students 
+GROUP BY dept_id;
+Loophole / Trap: Adding HAVING COUNT(student_id) >= 1 to Method B is redundant. A GROUP BY clause naturally omits groups with zero rows.Q4 · Medium: Scholarship ClassificationRequirement: Show student name and scholarship_status ('Full' for $\ge 40000$, 'Partial' for $1$ to $39999$, 'None' for NULL or $0$). Order by scholarship descending, nulls last.Grain: 1 row per student.Key Concept: Conditional bucketing using CASE WHEN and explicit NULLS LAST.SQLSELECT 
+    name, 
+    CASE 
+        WHEN scholarship >= 40000 THEN 'Full'
+        WHEN scholarship >= 1 THEN 'Partial'
+        ELSE 'None'
+    END AS scholarship_status
+FROM students
+ORDER BY scholarship DESC NULLS LAST;
+Loophole / Trap: In PostgreSQL, sorting ORDER BY scholarship DESC places NULL values at the top by default. You must explicitly specify NULLS LAST to push missing values to the bottom. Also ensure CASE blocks use single quotes for string literals ('Full') and close with the END keyword.Q5 · Hard: Student Contact Directory & Profile CompletenessRequirement: Display name, dept_id, contact, and profile_complete ('Yes' if both exist, 'Partial' if one exists, 'No' if neither exists). Order by profile_complete, then name.Grain: 1 row per student record.Key Concept: Multi-condition boolean logic inside CASE WHEN.SQLSELECT 
+    name, 
+    dept_id, 
+    COALESCE(email, phone, 'no contact') AS contact,
+    CASE 
+        WHEN email IS NOT NULL AND phone IS NOT NULL THEN 'Yes'
+        WHEN email IS NOT NULL OR phone IS NOT NULL THEN 'Partial'
+        ELSE 'No'
+    END AS profile_complete
+FROM students
+ORDER BY 
+    profile_complete ASC, 
+    name ASC;
+5. Summary Reference Cheat SheetSituation / TaskCorrect ApproachPitfall / Incorrect PatternComparing against NULLWHERE col IS NULLWHERE col = NULL (Evaluates to UNKNOWN)Selecting first valid valueCOALESCE(v1, v2, 'default')Nesting multiple CASE WHEN v1 IS NULL... statementsDescending sort with NULLs at endORDER BY col DESC NULLS LASTORDER BY col DESC (Puts NULLs first in Postgres)Filtering grouped outputsHAVING COUNT(*) > 1WHERE COUNT(*) > 1 (Invalid execution phase)String Literals vs Identifiers'active' (Single quotes)"active" (Double quotes denote table/column names)

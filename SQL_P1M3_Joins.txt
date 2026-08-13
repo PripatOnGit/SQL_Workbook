@@ -1,0 +1,59 @@
+Master Guide: SQL Joins & Relational Data1. The Core Mental ModelA JOIN in SQL is fundamentally a filtered cross product.When you join two tables, the SQL execution engine conceptually pairs every row from Table A with every row from Table B (Cartesian product: $M \times N$ rows). The ON clause then acts as a filter, retaining only the row pairs that satisfy your join condition.2. Join Types Quick ReferenceJoin TypeWhat it KeepsWhat Happens When No Match FoundINNER JOINOnly rows with matching keys in both tables.Non-matching rows from both tables are dropped.LEFT JOINAll rows from the left (anchor) table + matching right rows.Right-side columns are filled with NULL.RIGHT JOINAll rows from the right table + matching left rows.Left-side columns are filled with NULL (rarely used—flip tables to a LEFT JOIN instead).FULL OUTER JOINAll rows from both tables.Missing values on either side are filled with NULL.CROSS JOINEvery possible combination ($M \times N$).No ON condition applied.SELF JOINJoins a table to itself using aliases.Can be INNER or LEFT, depending on requirements.3. Top Interview Gotchas & Traps⚠️ Gotcha 1: Filter in ON vs. WHERE for Outer JoinsThe location of a filter on the right-side (optional) table completely alters query behavior due to the order of execution:ON filters during the join phase.WHERE filters after the join and NULL-filling phase.The Problem:Placing a right-side condition in the WHERE clause silently converts a LEFT JOIN into an INNER JOIN.SQL-- ❌ WRONG: Converts to INNER JOIN (drops unplaced/pre-2025 students)
+SELECT s.name, p.company 
+FROM students s 
+LEFT JOIN placements p 
+  ON s.student_id = p.student_id 
+WHERE p.offer_date >= '2025-01-01';
+
+-- ✅ CORRECT: Preserves all students, showing NULL for no 2025 offer
+SELECT s.name, p.company 
+FROM students s 
+LEFT JOIN placements p 
+  ON s.student_id = p.student_id 
+ AND p.offer_date >= '2025-01-01';
+Why? Unplaced students produce NULL for p.offer_date. The expression NULL >= '2025-01-01' evaluates to UNKNOWN/FALSE in WHERE, so those rows are dropped.⚠️ Gotcha 2: Join Fan-Out Inflates AggregatesWhen joining across a $1 \rightarrow N$ (one-to-many) relationship, rows from the "1" side are duplicated for every match on the "N" side.Example:If Student #1 has $3$ course enrollments and a $\$1,000$ scholarship:SQL-- ❌ WRONG: Calculates scholarship as $1000 * 3 = $3000!
+SELECT s.student_id, SUM(s.scholarship)
+FROM students s
+JOIN enrollments e ON s.student_id = e.student_id
+GROUP BY s.student_id;
+How to Fix It:Fix A (Pre-Aggregate via Subquery/CTE): Aggregate the "many" side before joining.SQLWITH enrollment_counts AS (
+    SELECT student_id, COUNT(course_id) AS total_courses
+    FROM enrollments
+    GROUP BY student_id
+)
+SELECT s.student_id, s.scholarship, COALESCE(ec.total_courses, 0)
+FROM students s
+LEFT JOIN enrollment_counts ec ON s.student_id = ec.student_id;
+Fix B (COUNT(DISTINCT)): Works for counts, but does not fix SUM() or AVG().4. Key Patterns & Common Techniques1. The Anti-Join PatternUsed to find records in Table A that have no matching record in Table B (e.g., "Find all students who have never been placed").Mechanism: LEFT JOIN + WHERE right_table.key IS NULLSQLSELECT s.name, s.dept_id, s.gpa
+FROM students s
+LEFT JOIN placements p 
+  ON s.student_id = p.student_id
+WHERE p.student_id IS NULL;
+2. Handling NULL Defaults with COALESCEWhen using LEFT JOIN, missing right-side values appear as NULL. Use COALESCE(val, default) to provide readable fallbacks.SQLSELECT 
+    s.name,
+    COALESCE(p.company, 'Not Placed') AS company,
+    COALESCE(p.ctc, 0) AS ctc
+FROM students s
+LEFT JOIN placements p 
+  ON s.student_id = p.student_id;
+3. Self-Joins (Hierarchies & Graph Relationships)Used when a single table references itself (e.g., employee to manager, course to prerequisite).Crucial Step: Always use explicit, distinct table aliases (e.g., c1 for course, c2 for prerequisite).Key Direction Check: Match the child's foreign key to the parent's primary key.SQL-- Shows each course and its prerequisite course name
+SELECT 
+    c1.course_name, 
+    COALESCE(c2.course_name, 'None') AS prerequisite_course_name
+FROM courses c1 
+LEFT JOIN courses c2
+   ON c1.prereq_course_id = c2.course_id;
+5. Pre-Query Brainstorm ChecklistBefore writing any JOIN query, run through these 4 questions:┌─────────────────────────────────────────────────────────────────────────────┐
+│ 1. ANCHOR TABLE: Which table's rows must I NEVER lose?                     │
+│    └─► Determines LEFT JOIN vs INNER JOIN.                                  │
+│                                                                             │
+│ 2. FAN-OUT RISK: Could the right side fan-out my rows before aggregating?  │
+│    └─► If yes, aggregate in a CTE/subquery FIRST.                           │
+│                                                                             │
+│ 3. FILTER PLACEMENT: Am I filtering the right-side table in WHERE?          │
+│    └─► Move optional filters to ON clause to avoid accidental INNER JOIN.   │
+│                                                                             │
+│ 4. NECESSITY CHECK: Do I actually need columns from both tables?            │
+│    └─► If filtering only, consider EXISTS or IN instead of a JOIN.          │
+└─────────────────────────────────────────────────────────────────────────────┘
+6. SQL Syntax Rules & Pitfalls to AvoidTable Names: Double-check pluralization (departments vs. department, students vs. student).Column Aliases in ORDER BY: Sorting on aliased expressions (e.g., COALESCE(p.ctc, 0) DESC) ensures deterministic NULL handling across SQL dialects.Explicit Joins: Always write out INNER JOIN or LEFT JOIN explicitly rather than implicit comma-separated joins (FROM tableA, tableB WHERE ...).

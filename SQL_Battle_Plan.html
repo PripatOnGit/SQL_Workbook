@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL Battle Plan — 3-Day Interview Mastery</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ─────────────────────────────────────────────── */
+:root {
+  --bg:        #07080F;
+  --surf:      #0D1020;
+  --surf2:     #141828;
+  --border:    #1C2140;
+  --border2:   #242950;
+  --amber:     #F59E0B;
+  --amber-bg:  rgba(245,158,11,0.08);
+  --amber-bd:  rgba(245,158,11,0.25);
+  --sky:       #38BDF8;
+  --sky-bg:    rgba(56,189,248,0.08);
+  --sky-bd:    rgba(56,189,248,0.25);
+  --emerald:   #10B981;
+  --emer-bg:   rgba(16,185,129,0.08);
+  --emer-bd:   rgba(16,185,129,0.25);
+  --violet:    #A78BFA;
+  --viol-bg:   rgba(167,139,250,0.08);
+  --viol-bd:   rgba(167,139,250,0.25);
+  --rose:      #FB7185;
+  --rose-bg:   rgba(251,113,133,0.08);
+  --text:      #E8EAF6;
+  --text2:     #8B92B8;
+  --text3:     #4A5080;
+  --radius:    10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.65;font-size:14.5px;}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:var(--surf);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+/* ── HERO ─────────────────────────────────────────────────── */
+.hero{
+  padding:4.5rem 2rem 3rem;
+  text-align:center;
+  background:radial-gradient(ellipse 80% 60% at 50% -10%, rgba(245,158,11,0.12) 0%, transparent 70%),var(--bg);
+  border-bottom:1px solid var(--border);
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);
+  background-size:48px 48px;opacity:0.18;pointer-events:none;
+}
+.hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--amber);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:1rem;position:relative;}
+.hero h1{font-family:'Space Grotesk',sans-serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:700;color:#fff;line-height:1.1;position:relative;}
+.hero h1 .accent{color:var(--amber);}
+.hero .mission{font-size:0.9rem;color:var(--text2);margin-top:0.9rem;position:relative;max-width:520px;margin-left:auto;margin-right:auto;}
+
+/* ── STATS BAR ────────────────────────────────────────────── */
+.stats-bar{display:flex;justify-content:center;gap:0;border-bottom:1px solid var(--border);}
+.stat{flex:1;max-width:200px;padding:1.5rem 1rem;text-align:center;border-right:1px solid var(--border);}
+.stat:last-child{border-right:none;}
+.stat-num{font-family:'Space Grotesk',sans-serif;font-size:2.2rem;font-weight:700;line-height:1;}
+.stat-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--text3);margin-top:0.3rem;}
+.stat.s1 .stat-num{color:var(--amber);}
+.stat.s2 .stat-num{color:var(--sky);}
+.stat.s3 .stat-num{color:var(--emerald);}
+.stat.s4 .stat-num{color:var(--violet);}
+
+/* ── LAYOUT ───────────────────────────────────────────────── */
+.container{max-width:960px;margin:0 auto;padding:2rem 1.5rem;}
+.sec-head{display:flex;align-items:center;gap:0.75rem;margin:2.5rem 0 1.25rem;}
+.sec-head h2{font-family:'Space Grotesk',sans-serif;font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.14em;color:var(--text3);}
+.sec-head .line{flex:1;height:1px;background:var(--border);}
+.sec-head .tag{font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:0.2rem 0.6rem;border-radius:20px;}
+.tag-amber{color:var(--amber);background:var(--amber-bg);border:1px solid var(--amber-bd);}
+.tag-sky{color:var(--sky);background:var(--sky-bg);border:1px solid var(--sky-bd);}
+.tag-em{color:var(--emerald);background:var(--emer-bg);border:1px solid var(--emer-bd);}
+
+/* ── GOAL CARD ───────────────────────────────────────────── */
+.goal-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1rem;}
+.goal-card h3{font-family:'Space Grotesk',sans-serif;font-size:0.95rem;font-weight:700;color:#fff;margin-bottom:1rem;}
+.goal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.75rem;}
+.goal-item{background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:0.9rem 1rem;font-size:0.82rem;color:var(--text);display:flex;gap:0.6rem;align-items:flex-start;}
+.goal-icon{font-size:1rem;flex-shrink:0;}
+
+/* ── DAY TABS ────────────────────────────────────────────── */
+.day-tabs{display:flex;gap:0;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1.25rem;}
+.day-tab{flex:1;padding:0.75rem 1rem;text-align:center;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:0.82rem;font-weight:600;color:var(--text3);background:var(--surf);border:none;border-right:1px solid var(--border);transition:all 0.2s;}
+.day-tab:last-child{border-right:none;}
+.day-tab:hover{color:var(--text);background:var(--surf2);}
+.day-tab.active{background:var(--surf2);color:#fff;}
+.day-tab.d1.active{border-bottom:2px solid var(--amber);color:var(--amber);}
+.day-tab.d2.active{border-bottom:2px solid var(--sky);color:var(--sky);}
+.day-tab.d3.active{border-bottom:2px solid var(--emerald);color:var(--emerald);}
+
+.day-panel{display:none;}
+.day-panel.active{display:block;}
+
+/* ── TIME BLOCKS ─────────────────────────────────────────── */
+.time-bar{display:flex;height:36px;border-radius:8px;overflow:hidden;margin-bottom:1.25rem;gap:2px;}
+.tb{display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:0.6rem;font-weight:500;color:rgba(255,255,255,0.7);white-space:nowrap;overflow:hidden;border-radius:4px;}
+.tb-m1{background:rgba(245,158,11,0.35);}
+.tb-m2{background:rgba(245,158,11,0.45);}
+.tb-m3{background:rgba(245,158,11,0.55);}
+.tb-m4{background:rgba(245,158,11,0.40);}
+.tb-m5{background:rgba(56,189,248,0.40);}
+.tb-m6{background:rgba(56,189,248,0.50);}
+.tb-m7{background:rgba(56,189,248,0.35);}
+.tb-m8{background:rgba(56,189,248,0.45);}
+.tb-m9{background:rgba(16,185,129,0.35);}
+.tb-m10{background:rgba(16,185,129,0.45);}
+.tb-m11{background:rgba(16,185,129,0.40);}
+.tb-m12{background:rgba(16,185,129,0.50);}
+.tb-buf{background:rgba(255,255,255,0.06);}
+
+/* ── MODULE ROWS ─────────────────────────────────────────── */
+.mod-list{display:flex;flex-direction:column;gap:0.5rem;}
+.mod-row{
+  display:grid;grid-template-columns:56px 1fr auto auto;align-items:center;gap:0.75rem;
+  background:var(--surf);border:1px solid var(--border);border-radius:8px;
+  padding:0.75rem 1rem;transition:background 0.15s;
+}
+.mod-row:hover{background:var(--surf2);}
+.prompt-code{font-family:'JetBrains Mono',monospace;font-size:0.7rem;font-weight:500;padding:0.2rem 0.4rem;border-radius:5px;text-align:center;}
+.pc-p1{color:var(--amber);background:var(--amber-bg);border:1px solid var(--amber-bd);}
+.pc-p2{color:var(--sky);background:var(--sky-bg);border:1px solid var(--sky-bd);}
+.pc-p3{color:var(--emerald);background:var(--emer-bg);border:1px solid var(--emer-bd);}
+.mod-info{}
+.mod-name{font-weight:600;font-size:0.85rem;color:#fff;}
+.mod-syntax{font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--text3);margin-top:0.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mod-time{font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--text2);white-space:nowrap;}
+.mod-diff{font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;padding:0.15rem 0.4rem;border-radius:4px;white-space:nowrap;}
+.diff-core{color:var(--amber);background:var(--amber-bg);}
+.diff-ana{color:var(--sky);background:var(--sky-bg);}
+.diff-arch{color:var(--emerald);background:var(--emer-bg);}
+.diff-buf{color:var(--text3);background:transparent;}
+
+.day-total{display:flex;justify-content:flex-end;align-items:center;gap:0.5rem;margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid var(--border);}
+.day-total span{font-size:0.75rem;color:var(--text3);}
+.day-total strong{font-family:'JetBrains Mono',monospace;font-size:0.85rem;color:var(--text);}
+
+/* ── RHYTHM ──────────────────────────────────────────────── */
+.rhythm-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.rhythm-row{display:flex;gap:1rem;padding:1rem 1.25rem;border-bottom:1px solid var(--border);align-items:flex-start;}
+.rhythm-row:last-child{border-bottom:none;}
+.rnum{width:30px;height:30px;min-width:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-size:0.75rem;font-weight:700;margin-top:0.1rem;}
+.rnum-norm{background:var(--surf2);color:var(--text2);border:1px solid var(--border);}
+.rnum-hl{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-bd);}
+.r-body{flex:1;}
+.r-body p{font-size:0.85rem;color:var(--text);}
+.r-body strong{color:#fff;}
+.r-time{font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--amber);white-space:nowrap;margin-top:0.1rem;}
+
+/* ── SCHEMA ──────────────────────────────────────────────── */
+.schema-tabs{display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1rem;}
+.stab{font-family:'JetBrains Mono',monospace;font-size:0.72rem;padding:0.3rem 0.75rem;border-radius:6px;cursor:pointer;background:var(--surf);border:1px solid var(--border);color:var(--text2);transition:all 0.15s;}
+.stab:hover{color:var(--text);}
+.stab.active{background:var(--amber-bg);border-color:var(--amber-bd);color:var(--amber);}
+.spanel{display:none;}
+.spanel.active{display:block;}
+pre{background:#050710;border:1px solid var(--border);border-radius:8px;padding:1.1rem 1.25rem;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:0.75rem;line-height:1.7;color:#9AA5CE;}
+pre .kw{color:#89DDFF;font-weight:600;}
+pre .fn{color:#82AAFF;}
+pre .cm{color:#4A5080;font-style:italic;}
+pre .str{color:#C3E88D;}
+pre .num{color:#F78C6C;}
+pre .type{color:#FFCB6B;}
+
+/* ── MAPPING TABLE ───────────────────────────────────────── */
+.map-table{width:100%;border-collapse:collapse;font-size:0.8rem;}
+.map-table th{background:var(--surf2);padding:0.6rem 1rem;text-align:left;color:var(--text2);font-weight:600;border-bottom:1px solid var(--border);white-space:nowrap;}
+.map-table td{padding:0.6rem 1rem;border-bottom:1px solid var(--border);vertical-align:middle;}
+.map-table tr:last-child td{border-bottom:none;}
+.map-table tr:hover td{background:var(--surf2);}
+.tbl-tag{font-family:'JetBrains Mono',monospace;font-size:0.65rem;padding:0.1rem 0.35rem;background:var(--surf2);border:1px solid var(--border);border-radius:4px;color:var(--text2);white-space:nowrap;display:inline-block;margin:0.1rem;}
+
+/* ── RULES ───────────────────────────────────────────────── */
+.rules-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:0.75rem;}
+.rule-card{background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);padding:1.1rem;}
+.rule-card h4{font-family:'Space Grotesk',sans-serif;font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);margin-bottom:0.75rem;}
+.rule-item{display:flex;gap:0.6rem;padding:0.35rem 0;border-bottom:1px solid var(--border);font-size:0.82rem;color:var(--text);}
+.rule-item:last-child{border-bottom:none;}
+.rule-item .ri{font-size:0.75rem;margin-top:0.1rem;flex-shrink:0;}
+
+/* ── REVIEW PROTOCOL ─────────────────────────────────────── */
+.proto-row{display:grid;grid-template-columns:40px 1fr;gap:1rem;padding:1rem 1.25rem;border-bottom:1px solid var(--border);align-items:start;}
+.proto-row:last-child{border-bottom:none;}
+.proto-badge{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.p-ok{background:var(--emer-bg);}
+.p-warn{background:var(--amber-bg);}
+.p-err{background:var(--rose-bg);}
+.proto-body h5{font-size:0.8rem;font-weight:600;color:#fff;margin-bottom:0.2rem;}
+.proto-body p{font-size:0.8rem;color:var(--text2);}
+
+/* ── CHECKLIST ───────────────────────────────────────────── */
+.chk-list{display:flex;flex-direction:column;gap:0.4rem;}
+.chk-item{display:flex;align-items:flex-start;gap:0.75rem;padding:0.6rem 1rem;background:var(--surf);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:background 0.15s;}
+.chk-item:hover{background:var(--surf2);}
+.chk-item input{margin-top:0.15rem;accent-color:var(--amber);width:14px;height:14px;min-width:14px;cursor:pointer;}
+.chk-item label{font-size:0.85rem;color:var(--text);cursor:pointer;}
+.chk-item.done label{color:var(--text3);text-decoration:line-through;}
+
+/* ── MODULE QUICK REF ────────────────────────────────────── */
+.qref-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:0.5rem;}
+.qref-card{background:var(--surf);border:1px solid var(--border);border-radius:8px;padding:0.9rem 1rem;display:flex;gap:0.75rem;align-items:flex-start;}
+.qref-code{font-family:'JetBrains Mono',monospace;font-size:0.8rem;font-weight:700;padding:0.25rem 0.5rem;border-radius:6px;white-space:nowrap;}
+.qref-body{}
+.qref-name{font-weight:600;font-size:0.82rem;color:#fff;}
+.qref-scope{font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--text3);margin-top:0.2rem;line-height:1.4;}
+
+/* ── FOOTER ──────────────────────────────────────────────── */
+footer{text-align:center;padding:2.5rem 1rem;border-top:1px solid var(--border);color:var(--text3);font-size:0.75rem;margin-top:3rem;}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">$ sql --mode interview --confidence max</div>
+  <h1>3-Day SQL <span class="accent">Battle Plan</span></h1>
+  <p class="mission">15 hours. 12 modules. One college database. One goal: walk into any data role interview and reason through every SQL question with clarity and speed.</p>
+</div>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat s1"><div class="stat-num">3</div><div class="stat-label">Days</div></div>
+  <div class="stat s2"><div class="stat-num">15</div><div class="stat-label">Hours Total</div></div>
+  <div class="stat s3"><div class="stat-num">12</div><div class="stat-label">Modules</div></div>
+  <div class="stat s4"><div class="stat-num">1</div><div class="stat-label">Goal</div></div>
+</div>
+
+<div class="container">
+
+<!-- GOAL -->
+<div class="sec-head"><h2>What Interview-Ready Looks Like</h2><div class="line"></div></div>
+<div class="goal-card">
+  <h3>By the end of Day 3 you will be able to —</h3>
+  <div class="goal-grid">
+    <div class="goal-item"><span class="goal-icon">🎯</span><span>Read a question and identify the right SQL construct within 30 seconds</span></div>
+    <div class="goal-item"><span class="goal-icon">⌨️</span><span>Write a correct query from a blank editor in 2–3 minutes without hesitation</span></div>
+    <div class="goal-item"><span class="goal-icon">🗣️</span><span>Explain your reasoning out loud while writing — not after</span></div>
+    <div class="goal-item"><span class="goal-icon">🔄</span><span>Handle follow-up questions on performance, edge cases, and alternatives</span></div>
+    <div class="goal-item"><span class="goal-icon">🚫</span><span>Know when NOT to use each construct — as clearly as when to use it</span></div>
+    <div class="goal-item"><span class="goal-icon">💡</span><span>Spot traps: fan-out, NULL bugs, DISTINCT misuse, wrong join type — before they happen</span></div>
+  </div>
+</div>
+
+<!-- 3-DAY PLAN -->
+<div class="sec-head"><h2>The 3-Day Plan</h2><div class="line"></div><span class="tag tag-amber">Prompt each module to begin</span></div>
+
+<div class="day-tabs">
+  <button class="day-tab d1 active" onclick="showDay(1)">📅 Day 1 — Phase 1: Core Retrieval</button>
+  <button class="day-tab d2" onclick="showDay(2)">📅 Day 2 — Phase 2: Analytical</button>
+  <button class="day-tab d3" onclick="showDay(3)">📅 Day 3 — Phase 3: Architecture</button>
+</div>
+
+<!-- DAY 1 -->
+<div class="day-panel active" id="day1">
+  <div class="time-bar">
+    <div class="tb tb-m1" style="flex:60">M1 · 60m</div>
+    <div class="tb tb-m2" style="flex:75">M2 · 75m</div>
+    <div class="tb tb-m3" style="flex:75">M3 · 75m</div>
+    <div class="tb tb-m4" style="flex:60">M4 · 60m</div>
+    <div class="tb tb-buf" style="flex:30">Buffer</div>
+  </div>
+  <div class="mod-list">
+    <div class="mod-row">
+      <span class="prompt-code pc-p1">P1M1</span>
+      <div class="mod-info"><div class="mod-name">The Foundation</div><div class="mod-syntax">SELECT · WHERE · ORDER BY · DISTINCT · LIMIT · COALESCE</div></div>
+      <span class="mod-time">60 min</span><span class="mod-diff diff-core">Core</span>
+    </div>
+    <div class="mod-row">
+      <span class="prompt-code pc-p1">P1M2</span>
+      <div class="mod-info"><div class="mod-name">Aggregation Logic</div><div class="mod-syntax">GROUP BY · HAVING · COUNT · SUM · AVG · MIN · MAX · NULLIF</div></div>
+      <span class="mod-time">75 min</span><span class="mod-diff diff-core">Core</span>
+    </div>
+    <div class="mod-row">
+      <span class="prompt-code pc-p1">P1M3</span>
+      <div class="mod-info"><div class="mod-name">Relational Joins</div><div class="mod-syntax">INNER · LEFT · RIGHT · FULL OUTER · SELF JOIN · ON vs USING</div></div>
+      <span class="mod-time">75 min</span><span class="mod-diff diff-core">Core</span>
+    </div>
+    <div class="mod-row">
+      <span class="prompt-code pc-p1">P1M4</span>
+      <div class="mod-info"><div class="mod-name">Conditional &amp; Subqueries</div><div class="mod-syntax">CASE WHEN · UNION ALL · Scalar · Correlated · EXISTS</div></div>
+      <span class="mod-time">60 min</span><span class="mod-diff diff-core">Core</span>
+    </div>
+    <div class="mod-row">
+      <span class="prompt-code" style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;padding:0.2rem 0.4rem;border-radius:5px;color:var(--text3);background:var(--surf2);">—</span>
+      <div class="mod-info"><div class="mod-name" style="color:var(--text3)">Buffer + Gap Review</div><div class="mod-syntax">Revisit weakest concept from Day 1</div></div>
+      <span class="mod-time">30 min</span><span class="mod-diff diff-buf">Buffer</span>
+    </div>
+  </div>
+  <div class="day-total"><span>Day 1 Total</span><strong>5h 00m</strong></div>
+</div>
+
+<!-- DAY 2 -->
+<div class="day-panel" id="day2">
+  <div class="time-bar">
+    <div class="tb tb-m5" style="flex:75">M5 · 75m</div>
+    <div class="tb tb-m6" style="flex:75">M6 · 75m</div>
+    <div class="tb tb-m7" style="flex:50">M7 · 50m</div>
+    <div class="tb tb-m8" style="flex:50">M8 · 50m</div>
+    <div class="tb tb-buf" style="flex:50">Buffer</div>
+  </div>
+  <div class="mod-list">
+    <div class="mod-row">
+      <span class="prompt-code pc-p2">P2M5</span>
+      <div class="mod-info"><div class="mod-name">Window Functions I</div><div class="mod-syntax">OVER() · PARTITION BY · ROW_NUMBER · RANK · DENSE_RANK</div></div>
+      <span class="mod-time">75 min</span><span class="mod-diff diff-ana">Analytical</span>
+    </div>
+    <div class="mod-row">
+      <span class="prompt-code pc-p2">P2M6</span>
+      <div class="mod-info"><div class="mod-name">Window Functions II</div><div class="mod-syntax">LAG · LEAD · FIRST_VALUE · Running Totals · Moving Avg</div></div>
+      <span class="mod-time">75 min</span><span class="mod-diff diff-ana">Analytical</span>
+    </div>
+    <div class="mod-row">
+      <span class="prompt-code pc-p2">P2M7</span>
+      <div class="mod-info"><div class="mod-name">Data Wrangling</div><div class="mod-syntax">SUBSTRING · CONCAT · DATE_TRUNC · EXTRACT · INTERVAL</div></div>
+      <span class="mod-time">50 min</span><span class="mod-diff diff-ana">Analytical</span>
+    </div>
+    <div class="mod-row">
+      <span class="prompt-code pc-p2">P2M8</span>
+      <div class="mod-info"><div class="mod-name">Modularity &amp; CTEs</div><div class="mod-syntax">WITH · Chained CTEs · Inline Views · Materialized Views</div></div>
+      <span class="mod-time">50 min</span><span class="mod-diff diff-ana">Analytical</span>
+    </div>
+    <div class="mod-row">
+      <span class="prompt-code" style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;padding:0.2rem 0.4rem;border-radius:5px;color:var(--text3);background:var(--surf2);">—</span>
+      <div class="mod-info"><div class="mod-name" style="color:var(--text3)">Buffer + Gap Review</div><div class="mod-syntax">Revisit weakest window concept</div></div>
+      <span class="mod-time">50 min</span><span class="mod-diff diff-buf">Buffer</span>
+    </div>
+  </div>
+  <div class="day-total"><span>Day 2 Total</span><strong>5h 00m</strong></div>
+</div>
+
+<!-- DAY 3 -->
+<div class="day-panel" id="day3">
+  <div class="time-bar">
+    <div class="tb tb-m9"  style="flex:40">M9 · 40m</div>
+    <div class="tb tb-m10" style="flex:50">M10 · 50m</div>
+    <div class="tb tb-m11" style="flex:50">M11 · 50m</div>
+    <div class="tb tb-m12" style="flex:50">M12 · 50m</div>
+    <div class="tb tb-buf" style="flex:60">Mock · 60m</div>
+    <div class="tb tb-buf" style="flex:50">Review</div>
+  </div>
+  <div class="mod-list">
+    <div class="mod-row">
+      <span class="prompt-code pc-p3">P3M9</span>
+      <div class="mod-info"><div class="mod-name">DDL &amp; DML Operations</div><div class="mod-syntax">CREATE · ALTER · INSERT · UPDATE · DELETE · MERGE</div></div>
+      <span class="mod-time">40 min</span><span class="mod-diff diff-arch">Arch</span>
+    </div>
+    <div class="mod-row">
+      <span class="prompt-code pc-p3">P3M10</span>
+      <div class="mod-info"><div class="mod-name">Database Design Rules</div><div class="mod-syntax">ACID · 1NF–3NF · OLTP vs OLAP · Star vs Snowflake</div></div>
+      <span class="mod-time">50 min</span><span class="mod-diff diff-arch">Arch</span>
+    </div>
+    <div class="mod-row">
+      <span class="prompt-code pc-p3">P3M11</span>
+      <div class="mod-info"><div class="mod-name">Performance Tuning</div><div class="mod-syntax">B-Tree Indexes · Partitioning · Columnar · EXPLAIN Plans</div></div>
+      <span class="mod-time">50 min</span><span class="mod-diff diff-arch">Arch</span>
+    </div>
+    <div class="mod-row">
+      <span class="prompt-code pc-p3">P3M12</span>
+      <div class="mod-info"><div class="mod-name">Advanced Scaling</div><div class="mod-syntax">Recursive CTEs · Hierarchical Tree Walking · Cycle Detection</div></div>
+      <span class="mod-time">50 min</span><span class="mod-diff diff-arch">Arch</span>
+    </div>
+    <div class="mod-row">
+      <span class="prompt-code" style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;padding:0.2rem 0.4rem;border-radius:5px;color:var(--violet);background:var(--viol-bg);border:1px solid var(--viol-bd);">MOCK</span>
+      <div class="mod-info"><div class="mod-name" style="color:var(--violet)">Mock Interview</div><div class="mod-syntax">8 unseen questions · Timed · No hints · Treat as real</div></div>
+      <span class="mod-time">60 min</span><span class="mod-diff" style="color:var(--violet);background:var(--viol-bg);">Final</span>
+    </div>
+    <div class="mod-row">
+      <span class="prompt-code" style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;padding:0.2rem 0.4rem;border-radius:5px;color:var(--text3);background:var(--surf2);">—</span>
+      <div class="mod-info"><div class="mod-name" style="color:var(--text3)">Final Gap Review</div><div class="mod-syntax">Weakest modules from Days 1–2, re-drilled</div></div>
+      <span class="mod-time">50 min</span><span class="mod-diff diff-buf">Buffer</span>
+    </div>
+  </div>
+  <div class="day-total"><span>Day 3 Total</span><strong>5h 00m</strong></div>
+</div>
+
+<!-- SESSION STRUCTURE -->
+<div class="sec-head"><h2>Every Session — Same 5-Step Rhythm</h2><div class="line"></div><span class="tag tag-amber">Fixed. No Deviation.</span></div>
+<div class="rhythm-card">
+  <div class="rhythm-row"><div class="rnum rnum-norm">1</div><div class="r-body"><p><strong>Mental Model</strong> — read once, say it out loud. Don't move on until it sounds obvious to you.</p></div><div class="r-time">5 min</div></div>
+  <div class="rhythm-row"><div class="rnum rnum-norm">2</div><div class="r-body"><p><strong>Concept Drill</strong> — run 1–2 tiny examples on the college schema. Predict output before running.</p></div><div class="r-time">10 min</div></div>
+  <div class="rhythm-row"><div class="rnum rnum-hl">3</div><div class="r-body"><p><strong>Brainstorm + Concepts to Remember</strong> — answer brainstorm questions out loud. Review the ⚡ Counter Questions in your guide — these are the follow-up punches interviewers throw after your first answer.</p></div><div class="r-time">5 min</div></div>
+  <div class="rhythm-row"><div class="rnum rnum-norm">4</div><div class="r-body"><p><strong>Self-Quiz</strong> — 60 seconds per question, no notes. Can't answer in 60 seconds = flag to revisit.</p></div><div class="r-time">5 min</div></div>
+  <div class="rhythm-row"><div class="rnum rnum-norm">5</div><div class="r-body"><p><strong>Practice Q1–Q5</strong> — write every query yourself. Paste here. I review, you fix. Exit gate: explain when NOT to use this module's syntax before I open the next.</p></div><div class="r-time">35 min</div></div>
+</div>
+
+<!-- SCHEMA -->
+<div class="sec-head"><h2>The College Database Schema</h2><div class="line"></div><span class="tag tag-sky">7 Tables · Run in PostgreSQL</span></div>
+
+<div class="schema-tabs">
+  <button class="stab active" onclick="showSchema('depts')">departments</button>
+  <button class="stab" onclick="showSchema('profs')">professors</button>
+  <button class="stab" onclick="showSchema('students')">students</button>
+  <button class="stab" onclick="showSchema('courses')">courses</button>
+  <button class="stab" onclick="showSchema('enrollments')">enrollments</button>
+  <button class="stab" onclick="showSchema('fees')">fees</button>
+  <button class="stab" onclick="showSchema('placements')">placements</button>
+  <button class="stab" onclick="showSchema('all')">▶ Run All</button>
+</div>
+
+<div class="spanel active" id="sp-depts"><pre><code><span class="kw">CREATE TABLE</span> departments (
+  dept_id   <span class="type">INT PRIMARY KEY</span>,
+  dept_name <span class="type">VARCHAR</span>(<span class="num">100</span>),
+  hod       <span class="type">VARCHAR</span>(<span class="num">100</span>),   <span class="cm">-- head of department</span>
+  building  <span class="type">VARCHAR</span>(<span class="num">50</span>)
+);
+
+<span class="kw">INSERT INTO</span> departments <span class="kw">VALUES</span>
+(<span class="num">1</span>, <span class="str">'Computer Science'</span>,        <span class="str">'Dr. Ananya Sharma'</span>, <span class="str">'Block A'</span>),
+(<span class="num">2</span>, <span class="str">'Electronics'</span>,             <span class="str">'Dr. Rajesh Mehta'</span>,  <span class="str">'Block B'</span>),
+(<span class="num">3</span>, <span class="str">'Mechanical Engineering'</span>,   <span class="str">'Dr. Sunita Nair'</span>,   <span class="str">'Block C'</span>),
+(<span class="num">4</span>, <span class="str">'Business Administration'</span>,  <span class="str">'Dr. Vikram Kapoor'</span>, <span class="str">'Block D'</span>);</code></pre></div>
+
+<div class="spanel" id="sp-profs"><pre><code><span class="kw">CREATE TABLE</span> professors (
+  prof_id   <span class="type">INT PRIMARY KEY</span>,
+  name      <span class="type">VARCHAR</span>(<span class="num">100</span>),
+  dept_id   <span class="type">INT</span>,
+  email     <span class="type">VARCHAR</span>(<span class="num">100</span>),
+  hire_date <span class="type">DATE</span>,
+  salary    <span class="type">DECIMAL</span>(<span class="num">10</span>,<span class="num">2</span>)
+);
+
+<span class="kw">INSERT INTO</span> professors <span class="kw">VALUES</span>
+(<span class="num">1</span>, <span class="str">'Prof. Suresh Rao'</span>,  <span class="num">1</span>, <span class="str">'srao@college.edu'</span>,   <span class="str">'2018-07-15'</span>, <span class="num">95000</span>),
+(<span class="num">2</span>, <span class="str">'Prof. Neha Patel'</span>,  <span class="num">1</span>, <span class="str">'npatel@college.edu'</span>, <span class="str">'2020-01-10'</span>, <span class="num">82000</span>),
+(<span class="num">3</span>, <span class="str">'Prof. Amit Singh'</span>,  <span class="num">2</span>, <span class="str">'asingh@college.edu'</span>, <span class="str">'2019-06-01'</span>, <span class="num">88000</span>),
+(<span class="num">4</span>, <span class="str">'Prof. Deepa Kumar'</span>, <span class="num">3</span>, <span class="str">'dkumar@college.edu'</span>, <span class="str">'2017-08-20'</span>, <span class="num">91000</span>),
+(<span class="num">5</span>, <span class="str">'Prof. Ritu Iyer'</span>,   <span class="num">4</span>, <span class="str">'riyer@college.edu'</span>,  <span class="str">'2021-03-15'</span>, <span class="num">78000</span>);</code></pre></div>
+
+<div class="spanel" id="sp-students"><pre><code><span class="kw">CREATE TABLE</span> students (
+  student_id      <span class="type">INT PRIMARY KEY</span>,
+  name            <span class="type">VARCHAR</span>(<span class="num">100</span>),
+  email           <span class="type">VARCHAR</span>(<span class="num">100</span>),   <span class="cm">-- NULL for some students</span>
+  phone           <span class="type">VARCHAR</span>(<span class="num">20</span>),    <span class="cm">-- NULL for some students</span>
+  dept_id         <span class="type">INT</span>,
+  enrollment_date <span class="type">DATE</span>,
+  gpa             <span class="type">DECIMAL</span>(<span class="num">3</span>,<span class="num">2</span>),  <span class="cm">-- NULL until first semester grades posted</span>
+  status          <span class="type">VARCHAR</span>(<span class="num">20</span>),   <span class="cm">-- 'active' | 'inactive' | 'graduated'</span>
+  scholarship     <span class="type">DECIMAL</span>(<span class="num">10</span>,<span class="num">2</span>) <span class="cm">-- NULL if no scholarship</span>
+);
+
+<span class="kw">INSERT INTO</span> students <span class="kw">VALUES</span>
+<span class="cm">--  id   name                email                  phone               dept  enrolled      gpa  status        scholarship</span>
+(<span class="num">1</span>,  <span class="str">'Arjun Mehta'</span>,   <span class="str">'arjun@mail.com'</span>,   <span class="str">'+91-9876543210'</span>,   <span class="num">1</span>, <span class="str">'2022-07-01'</span>, <span class="num">3.9</span>, <span class="str">'active'</span>,    <span class="num">50000</span>),
+(<span class="num">2</span>,  <span class="str">'Priya Sharma'</span>,  <span class="kw">NULL</span>,               <span class="str">'+91-9811223344'</span>,   <span class="num">1</span>, <span class="str">'2022-07-01'</span>, <span class="num">3.5</span>, <span class="str">'active'</span>,    <span class="kw">NULL</span>),
+(<span class="num">3</span>,  <span class="str">'Sofia Costa'</span>,   <span class="str">'sofia@mail.com'</span>,   <span class="str">'+55-9812345678'</span>,   <span class="num">2</span>, <span class="str">'2022-07-15'</span>, <span class="num">3.2</span>, <span class="str">'active'</span>,    <span class="num">30000</span>),
+(<span class="num">4</span>,  <span class="str">'James Walker'</span>,  <span class="kw">NULL</span>,               <span class="kw">NULL</span>,               <span class="num">2</span>, <span class="str">'2023-01-10'</span>, <span class="num">2.8</span>, <span class="str">'inactive'</span>, <span class="kw">NULL</span>),
+(<span class="num">5</span>,  <span class="str">'Meera Nair'</span>,    <span class="str">'meera@mail.com'</span>,   <span class="str">'+91-9123456789'</span>,   <span class="num">1</span>, <span class="str">'2022-07-01'</span>, <span class="num">3.8</span>, <span class="str">'active'</span>,    <span class="num">45000</span>),
+(<span class="num">6</span>,  <span class="str">'Riya Kapoor'</span>,   <span class="kw">NULL</span>,               <span class="kw">NULL</span>,               <span class="num">4</span>, <span class="str">'2023-07-01'</span>, <span class="num">3.1</span>, <span class="str">'active'</span>,    <span class="kw">NULL</span>),
+(<span class="num">7</span>,  <span class="str">'Carlos Mendez'</span>, <span class="kw">NULL</span>,               <span class="str">'+55-9987654321'</span>,   <span class="num">3</span>, <span class="str">'2023-01-15'</span>, <span class="num">2.5</span>, <span class="str">'active'</span>,    <span class="kw">NULL</span>),
+(<span class="num">8</span>,  <span class="str">'Aisha Khan'</span>,    <span class="str">'aisha@mail.com'</span>,   <span class="str">'+91-9765432109'</span>,   <span class="num">1</span>, <span class="str">'2022-07-01'</span>, <span class="num">3.7</span>, <span class="str">'active'</span>,    <span class="num">40000</span>),
+(<span class="num">9</span>,  <span class="str">'Dev Patel'</span>,     <span class="str">'dev@mail.com'</span>,     <span class="str">'+91-9654321098'</span>,   <span class="num">4</span>, <span class="str">'2021-07-01'</span>, <span class="num">3.0</span>, <span class="str">'graduated'</span>,<span class="kw">NULL</span>),
+(<span class="num">10</span>, <span class="str">'Neha Singh'</span>,    <span class="kw">NULL</span>,               <span class="str">'+91-9543210987'</span>,   <span class="num">2</span>, <span class="str">'2023-07-01'</span>, <span class="num">3.4</span>, <span class="str">'active'</span>,    <span class="kw">NULL</span>);</code></pre></div>
+
+<div class="spanel" id="sp-courses"><pre><code><span class="kw">CREATE TABLE</span> courses (
+  course_id        <span class="type">INT PRIMARY KEY</span>,
+  course_name      <span class="type">VARCHAR</span>(<span class="num">100</span>),
+  dept_id          <span class="type">INT</span>,
+  credits          <span class="type">INT</span>,
+  prereq_course_id <span class="type">INT</span>  <span class="cm">-- NULL = no prerequisite (self-ref → used in M12 recursive CTE)</span>
+);
+
+<span class="kw">INSERT INTO</span> courses <span class="kw">VALUES</span>
+(<span class="num">1</span>, <span class="str">'Intro to Programming'</span>,   <span class="num">1</span>, <span class="num">3</span>, <span class="kw">NULL</span>), <span class="cm">-- no prereq</span>
+(<span class="num">2</span>, <span class="str">'Data Structures'</span>,        <span class="num">1</span>, <span class="num">4</span>, <span class="num">1</span>),    <span class="cm">-- prereq: Intro (chain: 1→2)</span>
+(<span class="num">3</span>, <span class="str">'Algorithms'</span>,             <span class="num">1</span>, <span class="num">4</span>, <span class="num">2</span>),    <span class="cm">-- prereq: Data Structures (chain: 1→2→3)</span>
+(<span class="num">4</span>, <span class="str">'Database Systems'</span>,       <span class="num">1</span>, <span class="num">3</span>, <span class="num">2</span>),    <span class="cm">-- prereq: Data Structures (chain: 1→2→4)</span>
+(<span class="num">5</span>, <span class="str">'Circuit Analysis'</span>,       <span class="num">2</span>, <span class="num">4</span>, <span class="kw">NULL</span>), <span class="cm">-- no prereq</span>
+(<span class="num">6</span>, <span class="str">'Digital Systems'</span>,        <span class="num">2</span>, <span class="num">3</span>, <span class="num">5</span>),    <span class="cm">-- prereq: Circuit (chain: 5→6)</span>
+(<span class="num">7</span>, <span class="str">'Thermodynamics'</span>,         <span class="num">3</span>, <span class="num">4</span>, <span class="kw">NULL</span>), <span class="cm">-- no prereq</span>
+(<span class="num">8</span>, <span class="str">'Marketing Fundamentals'</span>, <span class="num">4</span>, <span class="num">3</span>, <span class="kw">NULL</span>); <span class="cm">-- no prereq</span></code></pre></div>
+
+<div class="spanel" id="sp-enrollments"><pre><code><span class="kw">CREATE TABLE</span> enrollments (
+  enrollment_id <span class="type">INT PRIMARY KEY</span>,
+  student_id    <span class="type">INT</span>,
+  course_id     <span class="type">INT</span>,
+  prof_id       <span class="type">INT</span>,
+  semester      <span class="type">VARCHAR</span>(<span class="num">10</span>),  <span class="cm">-- 'Spring' | 'Fall' | 'Summer'</span>
+  year          <span class="type">INT</span>,
+  grade         <span class="type">VARCHAR</span>(<span class="num">2</span>),   <span class="cm">-- NULL if semester is ongoing</span>
+  marks         <span class="type">INT</span>           <span class="cm">-- NULL if semester is ongoing</span>
+);
+
+<span class="kw">INSERT INTO</span> enrollments <span class="kw">VALUES</span>
+<span class="cm">-- 2024 Fall</span>
+(<span class="num">1</span>,  <span class="num">1</span>, <span class="num">1</span>, <span class="num">1</span>, <span class="str">'Fall'</span>,   <span class="num">2024</span>, <span class="str">'A'</span>, <span class="num">95</span>), (<span class="num">2</span>,  <span class="num">2</span>, <span class="num">1</span>, <span class="num">1</span>, <span class="str">'Fall'</span>,   <span class="num">2024</span>, <span class="str">'B'</span>, <span class="num">82</span>),
+(<span class="num">3</span>,  <span class="num">3</span>, <span class="num">5</span>, <span class="num">3</span>, <span class="str">'Fall'</span>,   <span class="num">2024</span>, <span class="str">'A'</span>, <span class="num">91</span>), (<span class="num">4</span>,  <span class="num">5</span>, <span class="num">1</span>, <span class="num">1</span>, <span class="str">'Fall'</span>,   <span class="num">2024</span>, <span class="str">'A'</span>, <span class="num">93</span>),
+(<span class="num">5</span>,  <span class="num">8</span>, <span class="num">1</span>, <span class="num">1</span>, <span class="str">'Fall'</span>,   <span class="num">2024</span>, <span class="str">'A'</span>, <span class="num">90</span>), (<span class="num">6</span>,  <span class="num">7</span>, <span class="num">7</span>, <span class="num">4</span>, <span class="str">'Fall'</span>,   <span class="num">2024</span>, <span class="str">'C'</span>, <span class="num">68</span>),
+(<span class="num">7</span>,  <span class="num">6</span>, <span class="num">8</span>, <span class="num">5</span>, <span class="str">'Fall'</span>,   <span class="num">2024</span>, <span class="str">'B'</span>, <span class="num">78</span>),
+<span class="cm">-- 2025 Spring</span>
+(<span class="num">8</span>,  <span class="num">1</span>, <span class="num">2</span>, <span class="num">1</span>, <span class="str">'Spring'</span>, <span class="num">2025</span>, <span class="str">'A'</span>, <span class="num">97</span>), (<span class="num">9</span>,  <span class="num">2</span>, <span class="num">2</span>, <span class="num">1</span>, <span class="str">'Spring'</span>, <span class="num">2025</span>, <span class="str">'B'</span>, <span class="num">80</span>),
+(<span class="num">10</span>, <span class="num">5</span>, <span class="num">2</span>, <span class="num">1</span>, <span class="str">'Spring'</span>, <span class="num">2025</span>, <span class="str">'A'</span>, <span class="num">94</span>), (<span class="num">11</span>, <span class="num">8</span>, <span class="num">2</span>, <span class="num">2</span>, <span class="str">'Spring'</span>, <span class="num">2025</span>, <span class="str">'B'</span>, <span class="num">85</span>),
+(<span class="num">12</span>, <span class="num">3</span>, <span class="num">6</span>, <span class="num">3</span>, <span class="str">'Spring'</span>, <span class="num">2025</span>, <span class="str">'B'</span>, <span class="num">83</span>), (<span class="num">13</span>, <span class="num">6</span>, <span class="num">8</span>, <span class="num">5</span>, <span class="str">'Spring'</span>, <span class="num">2025</span>, <span class="str">'A'</span>, <span class="num">88</span>),
+(<span class="num">14</span>, <span class="num">7</span>, <span class="num">7</span>, <span class="num">4</span>, <span class="str">'Spring'</span>, <span class="num">2025</span>, <span class="str">'D'</span>, <span class="num">55</span>),
+<span class="cm">-- 2025 Fall</span>
+(<span class="num">15</span>, <span class="num">1</span>, <span class="num">3</span>, <span class="num">1</span>, <span class="str">'Fall'</span>,   <span class="num">2025</span>, <span class="str">'A'</span>, <span class="num">96</span>), (<span class="num">16</span>, <span class="num">5</span>, <span class="num">3</span>, <span class="num">1</span>, <span class="str">'Fall'</span>,   <span class="num">2025</span>, <span class="str">'A'</span>, <span class="num">92</span>),
+(<span class="num">17</span>, <span class="num">8</span>, <span class="num">3</span>, <span class="num">2</span>, <span class="str">'Fall'</span>,   <span class="num">2025</span>, <span class="str">'B'</span>, <span class="num">86</span>), (<span class="num">18</span>, <span class="num">2</span>, <span class="num">4</span>, <span class="num">2</span>, <span class="str">'Fall'</span>,   <span class="num">2025</span>, <span class="str">'C'</span>, <span class="num">72</span>),
+(<span class="num">19</span>, <span class="num">4</span>, <span class="num">5</span>, <span class="num">3</span>, <span class="str">'Fall'</span>,   <span class="num">2025</span>, <span class="str">'D'</span>, <span class="num">58</span>), (<span class="num">20</span>, <span class="num">10</span>,<span class="num">5</span>, <span class="num">3</span>, <span class="str">'Fall'</span>,   <span class="num">2025</span>, <span class="str">'B'</span>, <span class="num">81</span>),
+<span class="cm">-- 2026 Spring (ongoing — grade and marks are NULL)</span>
+(<span class="num">21</span>, <span class="num">1</span>, <span class="num">4</span>, <span class="num">2</span>, <span class="str">'Spring'</span>, <span class="num">2026</span>, <span class="kw">NULL</span>, <span class="kw">NULL</span>),
+(<span class="num">22</span>, <span class="num">5</span>, <span class="num">4</span>, <span class="num">2</span>, <span class="str">'Spring'</span>, <span class="num">2026</span>, <span class="kw">NULL</span>, <span class="kw">NULL</span>),
+(<span class="num">23</span>, <span class="num">3</span>, <span class="num">3</span>, <span class="num">1</span>, <span class="str">'Spring'</span>, <span class="num">2026</span>, <span class="kw">NULL</span>, <span class="kw">NULL</span>);</code></pre></div>
+
+<div class="spanel" id="sp-fees"><pre><code><span class="kw">CREATE TABLE</span> fees (
+  fee_id     <span class="type">INT PRIMARY KEY</span>,
+  student_id <span class="type">INT</span>,
+  semester   <span class="type">VARCHAR</span>(<span class="num">10</span>),
+  year       <span class="type">INT</span>,
+  amount     <span class="type">DECIMAL</span>(<span class="num">10</span>,<span class="num">2</span>),
+  paid_date  <span class="type">DATE</span>,           <span class="cm">-- NULL if not yet paid</span>
+  status     <span class="type">VARCHAR</span>(<span class="num">20</span>)    <span class="cm">-- 'paid' | 'pending' | 'overdue'</span>
+);
+
+<span class="kw">INSERT INTO</span> fees <span class="kw">VALUES</span>
+(<span class="num">1</span>,  <span class="num">1</span>, <span class="str">'Fall'</span>,   <span class="num">2024</span>, <span class="num">85000</span>, <span class="str">'2024-07-15'</span>, <span class="str">'paid'</span>),
+(<span class="num">2</span>,  <span class="num">2</span>, <span class="str">'Fall'</span>,   <span class="num">2024</span>, <span class="num">85000</span>, <span class="str">'2024-07-20'</span>, <span class="str">'paid'</span>),
+(<span class="num">3</span>,  <span class="num">3</span>, <span class="str">'Fall'</span>,   <span class="num">2024</span>, <span class="num">85000</span>, <span class="str">'2024-07-18'</span>, <span class="str">'paid'</span>),
+(<span class="num">4</span>,  <span class="num">4</span>, <span class="str">'Fall'</span>,   <span class="num">2024</span>, <span class="num">85000</span>, <span class="kw">NULL</span>,         <span class="str">'overdue'</span>),
+(<span class="num">5</span>,  <span class="num">5</span>, <span class="str">'Fall'</span>,   <span class="num">2024</span>, <span class="num">85000</span>, <span class="str">'2024-07-10'</span>, <span class="str">'paid'</span>),
+(<span class="num">6</span>,  <span class="num">6</span>, <span class="str">'Fall'</span>,   <span class="num">2024</span>, <span class="num">85000</span>, <span class="str">'2024-08-01'</span>, <span class="str">'paid'</span>),
+(<span class="num">7</span>,  <span class="num">7</span>, <span class="str">'Fall'</span>,   <span class="num">2024</span>, <span class="num">85000</span>, <span class="kw">NULL</span>,         <span class="str">'pending'</span>),
+(<span class="num">8</span>,  <span class="num">8</span>, <span class="str">'Fall'</span>,   <span class="num">2024</span>, <span class="num">85000</span>, <span class="str">'2024-07-12'</span>, <span class="str">'paid'</span>),
+(<span class="num">9</span>,  <span class="num">1</span>, <span class="str">'Spring'</span>, <span class="num">2025</span>, <span class="num">85000</span>, <span class="str">'2025-01-10'</span>, <span class="str">'paid'</span>),
+(<span class="num">10</span>, <span class="num">2</span>, <span class="str">'Spring'</span>, <span class="num">2025</span>, <span class="num">85000</span>, <span class="kw">NULL</span>,         <span class="str">'overdue'</span>),
+(<span class="num">11</span>, <span class="num">5</span>, <span class="str">'Spring'</span>, <span class="num">2025</span>, <span class="num">85000</span>, <span class="str">'2025-01-08'</span>, <span class="str">'paid'</span>),
+(<span class="num">12</span>, <span class="num">8</span>, <span class="str">'Spring'</span>, <span class="num">2025</span>, <span class="num">85000</span>, <span class="str">'2025-01-15'</span>, <span class="str">'paid'</span>);</code></pre></div>
+
+<div class="spanel" id="sp-placements"><pre><code><span class="kw">CREATE TABLE</span> placements (
+  placement_id <span class="type">INT PRIMARY KEY</span>,
+  student_id   <span class="type">INT</span>,
+  company      <span class="type">VARCHAR</span>(<span class="num">100</span>),
+  ctc          <span class="type">DECIMAL</span>(<span class="num">10</span>,<span class="num">2</span>), <span class="cm">-- annual cost to company (salary)</span>
+  offer_date   <span class="type">DATE</span>           <span class="cm">-- NULL if not yet placed</span>
+);
+
+<span class="kw">INSERT INTO</span> placements <span class="kw">VALUES</span>
+(<span class="num">1</span>, <span class="num">1</span>, <span class="str">'Google'</span>,    <span class="num">1800000</span>, <span class="str">'2025-11-01'</span>),
+(<span class="num">2</span>, <span class="num">5</span>, <span class="str">'Microsoft'</span>, <span class="num">1600000</span>, <span class="str">'2025-10-15'</span>),
+(<span class="num">3</span>, <span class="num">8</span>, <span class="str">'Amazon'</span>,    <span class="num">1500000</span>, <span class="str">'2025-11-20'</span>),
+(<span class="num">4</span>, <span class="num">2</span>, <span class="str">'Infosys'</span>,   <span class="num">1200000</span>, <span class="str">'2025-12-01'</span>),
+(<span class="num">5</span>, <span class="num">9</span>, <span class="str">'Deloitte'</span>,  <span class="num">1000000</span>, <span class="str">'2024-11-10'</span>),
+(<span class="num">6</span>, <span class="num">3</span>, <span class="str">'TCS'</span>,        <span class="num">900000</span>, <span class="str">'2025-12-15'</span>);
+<span class="cm">-- Students 4, 6, 7, 10 NOT placed — key for M3 anti-join exercises</span></code></pre></div>
+
+<div class="spanel" id="sp-all"><pre><code><span class="cm">-- ═══ PASTE ENTIRE BLOCK INTO YOUR SQL PLAYGROUND ════════════════</span>
+
+<span class="kw">DROP TABLE IF EXISTS</span> placements, fees, enrollments, courses, professors, students, departments;
+
+<span class="kw">CREATE TABLE</span> departments (dept_id <span class="type">INT PRIMARY KEY</span>, dept_name <span class="type">VARCHAR</span>(<span class="num">100</span>), hod <span class="type">VARCHAR</span>(<span class="num">100</span>), building <span class="type">VARCHAR</span>(<span class="num">50</span>));
+<span class="kw">INSERT INTO</span> departments <span class="kw">VALUES</span> (<span class="num">1</span>,<span class="str">'Computer Science'</span>,<span class="str">'Dr. Ananya Sharma'</span>,<span class="str">'Block A'</span>),(<span class="num">2</span>,<span class="str">'Electronics'</span>,<span class="str">'Dr. Rajesh Mehta'</span>,<span class="str">'Block B'</span>),(<span class="num">3</span>,<span class="str">'Mechanical Engineering'</span>,<span class="str">'Dr. Sunita Nair'</span>,<span class="str">'Block C'</span>),(<span class="num">4</span>,<span class="str">'Business Administration'</span>,<span class="str">'Dr. Vikram Kapoor'</span>,<span class="str">'Block D'</span>);
+
+<span class="kw">CREATE TABLE</span> professors (prof_id <span class="type">INT PRIMARY KEY</span>, name <span class="type">VARCHAR</span>(<span class="num">100</span>), dept_id <span class="type">INT</span>, email <span class="type">VARCHAR</span>(<span class="num">100</span>), hire_date <span class="type">DATE</span>, salary <span class="type">DECIMAL</span>(<span class="num">10</span>,<span class="num">2</span>));
+<span class="kw">INSERT INTO</span> professors <span class="kw">VALUES</span> (<span class="num">1</span>,<span class="str">'Prof. Suresh Rao'</span>,<span class="num">1</span>,<span class="str">'srao@college.edu'</span>,<span class="str">'2018-07-15'</span>,<span class="num">95000</span>),(<span class="num">2</span>,<span class="str">'Prof. Neha Patel'</span>,<span class="num">1</span>,<span class="str">'npatel@college.edu'</span>,<span class="str">'2020-01-10'</span>,<span class="num">82000</span>),(<span class="num">3</span>,<span class="str">'Prof. Amit Singh'</span>,<span class="num">2</span>,<span class="str">'asingh@college.edu'</span>,<span class="str">'2019-06-01'</span>,<span class="num">88000</span>),(<span class="num">4</span>,<span class="str">'Prof. Deepa Kumar'</span>,<span class="num">3</span>,<span class="str">'dkumar@college.edu'</span>,<span class="str">'2017-08-20'</span>,<span class="num">91000</span>),(<span class="num">5</span>,<span class="str">'Prof. Ritu Iyer'</span>,<span class="num">4</span>,<span class="str">'riyer@college.edu'</span>,<span class="str">'2021-03-15'</span>,<span class="num">78000</span>);
+
+<span class="kw">CREATE TABLE</span> students (student_id <span class="type">INT PRIMARY KEY</span>, name <span class="type">VARCHAR</span>(<span class="num">100</span>), email <span class="type">VARCHAR</span>(<span class="num">100</span>), phone <span class="type">VARCHAR</span>(<span class="num">20</span>), dept_id <span class="type">INT</span>, enrollment_date <span class="type">DATE</span>, gpa <span class="type">DECIMAL</span>(<span class="num">3</span>,<span class="num">2</span>), status <span class="type">VARCHAR</span>(<span class="num">20</span>), scholarship <span class="type">DECIMAL</span>(<span class="num">10</span>,<span class="num">2</span>));
+<span class="kw">INSERT INTO</span> students <span class="kw">VALUES</span> (<span class="num">1</span>,<span class="str">'Arjun Mehta'</span>,<span class="str">'arjun@mail.com'</span>,<span class="str">'+91-9876543210'</span>,<span class="num">1</span>,<span class="str">'2022-07-01'</span>,<span class="num">3.9</span>,<span class="str">'active'</span>,<span class="num">50000</span>),(<span class="num">2</span>,<span class="str">'Priya Sharma'</span>,<span class="kw">NULL</span>,<span class="str">'+91-9811223344'</span>,<span class="num">1</span>,<span class="str">'2022-07-01'</span>,<span class="num">3.5</span>,<span class="str">'active'</span>,<span class="kw">NULL</span>),(<span class="num">3</span>,<span class="str">'Sofia Costa'</span>,<span class="str">'sofia@mail.com'</span>,<span class="str">'+55-9812345678'</span>,<span class="num">2</span>,<span class="str">'2022-07-15'</span>,<span class="num">3.2</span>,<span class="str">'active'</span>,<span class="num">30000</span>),(<span class="num">4</span>,<span class="str">'James Walker'</span>,<span class="kw">NULL</span>,<span class="kw">NULL</span>,<span class="num">2</span>,<span class="str">'2023-01-10'</span>,<span class="num">2.8</span>,<span class="str">'inactive'</span>,<span class="kw">NULL</span>),(<span class="num">5</span>,<span class="str">'Meera Nair'</span>,<span class="str">'meera@mail.com'</span>,<span class="str">'+91-9123456789'</span>,<span class="num">1</span>,<span class="str">'2022-07-01'</span>,<span class="num">3.8</span>,<span class="str">'active'</span>,<span class="num">45000</span>),(<span class="num">6</span>,<span class="str">'Riya Kapoor'</span>,<span class="kw">NULL</span>,<span class="kw">NULL</span>,<span class="num">4</span>,<span class="str">'2023-07-01'</span>,<span class="num">3.1</span>,<span class="str">'active'</span>,<span class="kw">NULL</span>),(<span class="num">7</span>,<span class="str">'Carlos Mendez'</span>,<span class="kw">NULL</span>,<span class="str">'+55-9987654321'</span>,<span class="num">3</span>,<span class="str">'2023-01-15'</span>,<span class="num">2.5</span>,<span class="str">'active'</span>,<span class="kw">NULL</span>),(<span class="num">8</span>,<span class="str">'Aisha Khan'</span>,<span class="str">'aisha@mail.com'</span>,<span class="str">'+91-9765432109'</span>,<span class="num">1</span>,<span class="str">'2022-07-01'</span>,<span class="num">3.7</span>,<span class="str">'active'</span>,<span class="num">40000</span>),(<span class="num">9</span>,<span class="str">'Dev Patel'</span>,<span class="str">'dev@mail.com'</span>,<span class="str">'+91-9654321098'</span>,<span class="num">4</span>,<span class="str">'2021-07-01'</span>,<span class="num">3.0</span>,<span class="str">'graduated'</span>,<span class="kw">NULL</span>),(<span class="num">10</span>,<span class="str">'Neha Singh'</span>,<span class="kw">NULL</span>,<span class="str">'+91-9543210987'</span>,<span class="num">2</span>,<span class="str">'2023-07-01'</span>,<span class="num">3.4</span>,<span class="str">'active'</span>,<span class="kw">NULL</span>);
+
+<span class="kw">CREATE TABLE</span> courses (course_id <span class="type">INT PRIMARY KEY</span>, course_name <span class="type">VARCHAR</span>(<span class="num">100</span>), dept_id <span class="type">INT</span>, credits <span class="type">INT</span>, prereq_course_id <span class="type">INT</span>);
+<span class="kw">INSERT INTO</span> courses <span class="kw">VALUES</span> (<span class="num">1</span>,<span class="str">'Intro to Programming'</span>,<span class="num">1</span>,<span class="num">3</span>,<span class="kw">NULL</span>),(<span class="num">2</span>,<span class="str">'Data Structures'</span>,<span class="num">1</span>,<span class="num">4</span>,<span class="num">1</span>),(<span class="num">3</span>,<span class="str">'Algorithms'</span>,<span class="num">1</span>,<span class="num">4</span>,<span class="num">2</span>),(<span class="num">4</span>,<span class="str">'Database Systems'</span>,<span class="num">1</span>,<span class="num">3</span>,<span class="num">2</span>),(<span class="num">5</span>,<span class="str">'Circuit Analysis'</span>,<span class="num">2</span>,<span class="num">4</span>,<span class="kw">NULL</span>),(<span class="num">6</span>,<span class="str">'Digital Systems'</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">5</span>),(<span class="num">7</span>,<span class="str">'Thermodynamics'</span>,<span class="num">3</span>,<span class="num">4</span>,<span class="kw">NULL</span>),(<span class="num">8</span>,<span class="str">'Marketing Fundamentals'</span>,<span class="num">4</span>,<span class="num">3</span>,<span class="kw">NULL</span>);
+
+<span class="kw">CREATE TABLE</span> enrollments (enrollment_id <span class="type">INT PRIMARY KEY</span>, student_id <span class="type">INT</span>, course_id <span class="type">INT</span>, prof_id <span class="type">INT</span>, semester <span class="type">VARCHAR</span>(<span class="num">10</span>), year <span class="type">INT</span>, grade <span class="type">VARCHAR</span>(<span class="num">2</span>), marks <span class="type">INT</span>);
+<span class="kw">INSERT INTO</span> enrollments <span class="kw">VALUES</span> (<span class="num">1</span>,<span class="num">1</span>,<span class="num">1</span>,<span class="num">1</span>,<span class="str">'Fall'</span>,<span class="num">2024</span>,<span class="str">'A'</span>,<span class="num">95</span>),(<span class="num">2</span>,<span class="num">2</span>,<span class="num">1</span>,<span class="num">1</span>,<span class="str">'Fall'</span>,<span class="num">2024</span>,<span class="str">'B'</span>,<span class="num">82</span>),(<span class="num">3</span>,<span class="num">3</span>,<span class="num">5</span>,<span class="num">3</span>,<span class="str">'Fall'</span>,<span class="num">2024</span>,<span class="str">'A'</span>,<span class="num">91</span>),(<span class="num">4</span>,<span class="num">5</span>,<span class="num">1</span>,<span class="num">1</span>,<span class="str">'Fall'</span>,<span class="num">2024</span>,<span class="str">'A'</span>,<span class="num">93</span>),(<span class="num">5</span>,<span class="num">8</span>,<span class="num">1</span>,<span class="num">1</span>,<span class="str">'Fall'</span>,<span class="num">2024</span>,<span class="str">'A'</span>,<span class="num">90</span>),(<span class="num">6</span>,<span class="num">7</span>,<span class="num">7</span>,<span class="num">4</span>,<span class="str">'Fall'</span>,<span class="num">2024</span>,<span class="str">'C'</span>,<span class="num">68</span>),(<span class="num">7</span>,<span class="num">6</span>,<span class="num">8</span>,<span class="num">5</span>,<span class="str">'Fall'</span>,<span class="num">2024</span>,<span class="str">'B'</span>,<span class="num">78</span>),(<span class="num">8</span>,<span class="num">1</span>,<span class="num">2</span>,<span class="num">1</span>,<span class="str">'Spring'</span>,<span class="num">2025</span>,<span class="str">'A'</span>,<span class="num">97</span>),(<span class="num">9</span>,<span class="num">2</span>,<span class="num">2</span>,<span class="num">1</span>,<span class="str">'Spring'</span>,<span class="num">2025</span>,<span class="str">'B'</span>,<span class="num">80</span>),(<span class="num">10</span>,<span class="num">5</span>,<span class="num">2</span>,<span class="num">1</span>,<span class="str">'Spring'</span>,<span class="num">2025</span>,<span class="str">'A'</span>,<span class="num">94</span>),(<span class="num">11</span>,<span class="num">8</span>,<span class="num">2</span>,<span class="num">2</span>,<span class="str">'Spring'</span>,<span class="num">2025</span>,<span class="str">'B'</span>,<span class="num">85</span>),(<span class="num">12</span>,<span class="num">3</span>,<span class="num">6</span>,<span class="num">3</span>,<span class="str">'Spring'</span>,<span class="num">2025</span>,<span class="str">'B'</span>,<span class="num">83</span>),(<span class="num">13</span>,<span class="num">6</span>,<span class="num">8</span>,<span class="num">5</span>,<span class="str">'Spring'</span>,<span class="num">2025</span>,<span class="str">'A'</span>,<span class="num">88</span>),(<span class="num">14</span>,<span class="num">7</span>,<span class="num">7</span>,<span class="num">4</span>,<span class="str">'Spring'</span>,<span class="num">2025</span>,<span class="str">'D'</span>,<span class="num">55</span>),(<span class="num">15</span>,<span class="num">1</span>,<span class="num">3</span>,<span class="num">1</span>,<span class="str">'Fall'</span>,<span class="num">2025</span>,<span class="str">'A'</span>,<span class="num">96</span>),(<span class="num">16</span>,<span class="num">5</span>,<span class="num">3</span>,<span class="num">1</span>,<span class="str">'Fall'</span>,<span class="num">2025</span>,<span class="str">'A'</span>,<span class="num">92</span>),(<span class="num">17</span>,<span class="num">8</span>,<span class="num">3</span>,<span class="num">2</span>,<span class="str">'Fall'</span>,<span class="num">2025</span>,<span class="str">'B'</span>,<span class="num">86</span>),(<span class="num">18</span>,<span class="num">2</span>,<span class="num">4</span>,<span class="num">2</span>,<span class="str">'Fall'</span>,<span class="num">2025</span>,<span class="str">'C'</span>,<span class="num">72</span>),(<span class="num">19</span>,<span class="num">4</span>,<span class="num">5</span>,<span class="num">3</span>,<span class="str">'Fall'</span>,<span class="num">2025</span>,<span class="str">'D'</span>,<span class="num">58</span>),(<span class="num">20</span>,<span class="num">10</span>,<span class="num">5</span>,<span class="num">3</span>,<span class="str">'Fall'</span>,<span class="num">2025</span>,<span class="str">'B'</span>,<span class="num">81</span>),(<span class="num">21</span>,<span class="num">1</span>,<span class="num">4</span>,<span class="num">2</span>,<span class="str">'Spring'</span>,<span class="num">2026</span>,<span class="kw">NULL</span>,<span class="kw">NULL</span>),(<span class="num">22</span>,<span class="num">5</span>,<span class="num">4</span>,<span class="num">2</span>,<span class="str">'Spring'</span>,<span class="num">2026</span>,<span class="kw">NULL</span>,<span class="kw">NULL</span>),(<span class="num">23</span>,<span class="num">3</span>,<span class="num">3</span>,<span class="num">1</span>,<span class="str">'Spring'</span>,<span class="num">2026</span>,<span class="kw">NULL</span>,<span class="kw">NULL</span>);
+
+<span class="kw">CREATE TABLE</span> fees (fee_id <span class="type">INT PRIMARY KEY</span>, student_id <span class="type">INT</span>, semester <span class="type">VARCHAR</span>(<span class="num">10</span>), year <span class="type">INT</span>, amount <span class="type">DECIMAL</span>(<span class="num">10</span>,<span class="num">2</span>), paid_date <span class="type">DATE</span>, status <span class="type">VARCHAR</span>(<span class="num">20</span>));
+<span class="kw">INSERT INTO</span> fees <span class="kw">VALUES</span> (<span class="num">1</span>,<span class="num">1</span>,<span class="str">'Fall'</span>,<span class="num">2024</span>,<span class="num">85000</span>,<span class="str">'2024-07-15'</span>,<span class="str">'paid'</span>),(<span class="num">2</span>,<span class="num">2</span>,<span class="str">'Fall'</span>,<span class="num">2024</span>,<span class="num">85000</span>,<span class="str">'2024-07-20'</span>,<span class="str">'paid'</span>),(<span class="num">3</span>,<span class="num">3</span>,<span class="str">'Fall'</span>,<span class="num">2024</span>,<span class="num">85000</span>,<span class="str">'2024-07-18'</span>,<span class="str">'paid'</span>),(<span class="num">4</span>,<span class="num">4</span>,<span class="str">'Fall'</span>,<span class="num">2024</span>,<span class="num">85000</span>,<span class="kw">NULL</span>,<span class="str">'overdue'</span>),(<span class="num">5</span>,<span class="num">5</span>,<span class="str">'Fall'</span>,<span class="num">2024</span>,<span class="num">85000</span>,<span class="str">'2024-07-10'</span>,<span class="str">'paid'</span>),(<span class="num">6</span>,<span class="num">6</span>,<span class="str">'Fall'</span>,<span class="num">2024</span>,<span class="num">85000</span>,<span class="str">'2024-08-01'</span>,<span class="str">'paid'</span>),(<span class="num">7</span>,<span class="num">7</span>,<span class="str">'Fall'</span>,<span class="num">2024</span>,<span class="num">85000</span>,<span class="kw">NULL</span>,<span class="str">'pending'</span>),(<span class="num">8</span>,<span class="num">8</span>,<span class="str">'Fall'</span>,<span class="num">2024</span>,<span class="num">85000</span>,<span class="str">'2024-07-12'</span>,<span class="str">'paid'</span>),(<span class="num">9</span>,<span class="num">1</span>,<span class="str">'Spring'</span>,<span class="num">2025</span>,<span class="num">85000</span>,<span class="str">'2025-01-10'</span>,<span class="str">'paid'</span>),(<span class="num">10</span>,<span class="num">2</span>,<span class="str">'Spring'</span>,<span class="num">2025</span>,<span class="num">85000</span>,<span class="kw">NULL</span>,<span class="str">'overdue'</span>),(<span class="num">11</span>,<span class="num">5</span>,<span class="str">'Spring'</span>,<span class="num">2025</span>,<span class="num">85000</span>,<span class="str">'2025-01-08'</span>,<span class="str">'paid'</span>),(<span class="num">12</span>,<span class="num">8</span>,<span class="str">'Spring'</span>,<span class="num">2025</span>,<span class="num">85000</span>,<span class="str">'2025-01-15'</span>,<span class="str">'paid'</span>);
+
+<span class="kw">CREATE TABLE</span> placements (placement_id <span class="type">INT PRIMARY KEY</span>, student_id <span class="type">INT</span>, company <span class="type">VARCHAR</span>(<span class="num">100</span>), ctc <span class="type">DECIMAL</span>(<span class="num">10</span>,<span class="num">2</span>), offer_date <span class="type">DATE</span>);
+<span class="kw">INSERT INTO</span> placements <span class="kw">VALUES</span> (<span class="num">1</span>,<span class="num">1</span>,<span class="str">'Google'</span>,<span class="num">1800000</span>,<span class="str">'2025-11-01'</span>),(<span class="num">2</span>,<span class="num">5</span>,<span class="str">'Microsoft'</span>,<span class="num">1600000</span>,<span class="str">'2025-10-15'</span>),(<span class="num">3</span>,<span class="num">8</span>,<span class="str">'Amazon'</span>,<span class="num">1500000</span>,<span class="str">'2025-11-20'</span>),(<span class="num">4</span>,<span class="num">2</span>,<span class="str">'Infosys'</span>,<span class="num">1200000</span>,<span class="str">'2025-12-01'</span>),(<span class="num">5</span>,<span class="num">9</span>,<span class="str">'Deloitte'</span>,<span class="num">1000000</span>,<span class="str">'2024-11-10'</span>),(<span class="num">6</span>,<span class="num">3</span>,<span class="str">'TCS'</span>,<span class="num">900000</span>,<span class="str">'2025-12-15'</span>);
+
+<span class="cm">-- ✅ All 7 tables created and populated. Ready for all 12 modules.</span></code></pre></div>
+
+<!-- SCHEMA MAPPING -->
+<div class="sec-head"><h2>Schema → Module Mapping</h2><div class="line"></div></div>
+<div class="overview-card" style="background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
+<div style="overflow-x:auto;">
+<table class="map-table">
+  <thead><tr><th>Prompt</th><th>Module</th><th>Primary Tables</th><th>What the Data Exercises</th></tr></thead>
+  <tbody>
+    <tr><td><span class="prompt-code pc-p1" style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;padding:0.2rem 0.4rem;border-radius:5px;">P1M1</span></td><td>Foundation</td><td><span class="tbl-tag">students</span></td><td>COALESCE on NULL email/phone; ORDER BY enrollment_date; LIMIT top students</td></tr>
+    <tr><td><span class="prompt-code pc-p1" style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;padding:0.2rem 0.4rem;border-radius:5px;">P1M2</span></td><td>Aggregation</td><td><span class="tbl-tag">students</span> <span class="tbl-tag">enrollments</span> <span class="tbl-tag">fees</span></td><td>AVG GPA per dept; COUNT paid vs overdue fees; NULLIF on scholarship ratio</td></tr>
+    <tr><td><span class="prompt-code pc-p1" style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;padding:0.2rem 0.4rem;border-radius:5px;">P1M3</span></td><td>Joins</td><td><span class="tbl-tag">students</span> <span class="tbl-tag">placements</span> <span class="tbl-tag">departments</span></td><td>Anti-join: unplaced students; self-ref: course prerequisites; fan-out drill</td></tr>
+    <tr><td><span class="prompt-code pc-p1" style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;padding:0.2rem 0.4rem;border-radius:5px;">P1M4</span></td><td>Subqueries</td><td><span class="tbl-tag">students</span> <span class="tbl-tag">enrollments</span></td><td>CASE WHEN on grades; EXISTS for enrolled students; above-average GPA subquery</td></tr>
+    <tr><td><span class="prompt-code pc-p2" style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;padding:0.2rem 0.4rem;border-radius:5px;">P2M5</span></td><td>Window I</td><td><span class="tbl-tag">students</span> <span class="tbl-tag">enrollments</span></td><td>RANK students by GPA per dept; ROW_NUMBER to deduplicate; top-N per dept</td></tr>
+    <tr><td><span class="prompt-code pc-p2" style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;padding:0.2rem 0.4rem;border-radius:5px;">P2M6</span></td><td>Window II</td><td><span class="tbl-tag">enrollments</span></td><td>LAG marks semester-over-semester; running total of fees; marks improvement trend</td></tr>
+    <tr><td><span class="prompt-code pc-p2" style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;padding:0.2rem 0.4rem;border-radius:5px;">P2M7</span></td><td>Wrangling</td><td><span class="tbl-tag">students</span> <span class="tbl-tag">fees</span> <span class="tbl-tag">enrollments</span></td><td>DATE_TRUNC enrollment by month; EXTRACT year from enrollment; INTERVAL for recent joins</td></tr>
+    <tr><td><span class="prompt-code pc-p2" style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;padding:0.2rem 0.4rem;border-radius:5px;">P2M8</span></td><td>CTEs</td><td><span class="tbl-tag">all tables</span></td><td>Chain: enrolled → graded → ranked; reusable dept summary; 3-step pipeline</td></tr>
+    <tr><td><span class="prompt-code pc-p3" style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;padding:0.2rem 0.4rem;border-radius:5px;">P3M9</span></td><td>DDL/DML</td><td><span class="tbl-tag">students</span> <span class="tbl-tag">fees</span></td><td>INSERT new student; MERGE fee record upsert; safe NOT NULL migration</td></tr>
+    <tr><td><span class="prompt-code pc-p3" style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;padding:0.2rem 0.4rem;border-radius:5px;">P3M10</span></td><td>Design</td><td><span class="tbl-tag">conceptual</span></td><td>Normalize students schema; ACID on fee payment; OLTP vs OLAP design choices</td></tr>
+    <tr><td><span class="prompt-code pc-p3" style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;padding:0.2rem 0.4rem;border-radius:5px;">P3M11</span></td><td>Performance</td><td><span class="tbl-tag">enrollments</span> <span class="tbl-tag">fees</span></td><td>Index on student_id + semester; EXPLAIN on fee query; partition by year</td></tr>
+    <tr><td><span class="prompt-code pc-p3" style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;padding:0.2rem 0.4rem;border-radius:5px;">P3M12</span></td><td>Recursive</td><td><span class="tbl-tag">courses</span></td><td>Walk prereq_course_id chain: 1→2→3, 1→2→4; full path; cycle detection</td></tr>
+  </tbody>
+</table>
+</div></div>
+
+<!-- GROUND RULES -->
+<div class="sec-head"><h2>Ground Rules</h2><div class="line"></div></div>
+<div class="rules-grid">
+  <div class="rule-card">
+    <h4>⚙ How We Work</h4>
+    <div class="rule-item"><span class="ri">▸</span>Prompt each module using its code — P1M1, P1M2, P2M5, etc.</div>
+    <div class="rule-item"><span class="ri">▸</span>You write every query. I never give the answer first. You attempt, paste, I review.</div>
+    <div class="rule-item"><span class="ri">▸</span>Exit gate is mandatory — answer "when NOT to use" before I open the next module.</div>
+    <div class="rule-item"><span class="ri">▸</span>No skipping. If a module runs over, cut buffer — not module depth.</div>
+    <div class="rule-item"><span class="ri">▸</span>Day 3 ends with a timed mock interview. No hints. Treat it as the real thing.</div>
+  </div>
+  <div class="rule-card">
+    <h4>🗣 How to Think Out Loud</h4>
+    <div class="rule-item"><span class="ri">▸</span>Before writing, state the grain: "One row per student? Per dept? Per semester?"</div>
+    <div class="rule-item"><span class="ri">▸</span>State the join type and why: "LEFT JOIN because I want to keep unplaced students."</div>
+    <div class="rule-item"><span class="ri">▸</span>Name the construct before using it: "This needs a window function, not GROUP BY, because I need row-level detail alongside the rank."</div>
+    <div class="rule-item"><span class="ri">▸</span>Check for NULL traps before submitting: which columns could be NULL and does my query handle them?</div>
+  </div>
+</div>
+
+<!-- REVIEW PROTOCOL -->
+<div class="sec-head"><h2>Query Review Protocol</h2><div class="line"></div></div>
+<div style="background:var(--surf);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
+  <div class="proto-row"><div class="proto-badge p-ok">✅</div><div class="proto-body"><h5>Correct logic</h5><p>Confirmed, expected output shown, and we move directly to the next question.</p></div></div>
+  <div class="proto-row"><div class="proto-badge p-warn">⚠️</div><div class="proto-body"><h5>Right idea, one bug</h5><p>I point to the exact line and describe the category of error. You find and fix it — I don't rewrite it for you.</p></div></div>
+  <div class="proto-row"><div class="proto-badge" style="background:var(--rose-bg);">❌</div><div class="proto-body"><h5>Wrong approach</h5><p>I ask a diagnostic question that points you toward the right construct. You rethink and rewrite from scratch.</p></div></div>
+</div>
+
+<!-- TONIGHT CHECKLIST -->
+<div class="sec-head"><h2>Do Tonight — Before Day 1</h2><div class="line"></div><span class="tag tag-em">2 tasks only</span></div>
+<div class="chk-list">
+  <div class="chk-item" onclick="toggleChk(this)"><input type="checkbox"><label>Open PostgreSQL playground (pgAdmin, DBeaver, or db-fiddle.com). Paste the "▶ Run All" schema block. Verify all 7 tables load with no errors — you'll hear the prompt P1M1 tomorrow and need to be ready to write immediately.</label></div>
+  <div class="chk-item" onclick="toggleChk(this)"><input type="checkbox"><label>Read only the Mental Model section of Module 1 in your HTML study guide. Just the execution order paragraph. Say it out loud once: "FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY → LIMIT." That's it. Nothing else tonight.</label></div>
+</div>
+
+<!-- MODULE QUICK REFERENCE -->
+<div class="sec-head"><h2>Module Quick Reference</h2><div class="line"></div><span class="tag tag-amber">Prompt codes for every session</span></div>
+<div class="qref-grid">
+  <div class="qref-card"><span class="qref-code pc-p1">P1M1</span><div class="qref-body"><div class="qref-name">The Foundation</div><div class="qref-scope">SELECT · WHERE · COALESCE · LIMIT</div></div></div>
+  <div class="qref-card"><span class="qref-code pc-p1">P1M2</span><div class="qref-body"><div class="qref-name">Aggregation Logic</div><div class="qref-scope">GROUP BY · HAVING · COUNT · NULLIF</div></div></div>
+  <div class="qref-card"><span class="qref-code pc-p1">P1M3</span><div class="qref-body"><div class="qref-name">Relational Joins</div><div class="qref-scope">INNER · LEFT · SELF · anti-join</div></div></div>
+  <div class="qref-card"><span class="qref-code pc-p1">P1M4</span><div class="qref-body"><div class="qref-name">Subqueries</div><div class="qref-scope">CASE WHEN · EXISTS · UNION ALL</div></div></div>
+  <div class="qref-card"><span class="qref-code pc-p2">P2M5</span><div class="qref-body"><div class="qref-name">Window Functions I</div><div class="qref-scope">ROW_NUMBER · RANK · DENSE_RANK</div></div></div>
+  <div class="qref-card"><span class="qref-code pc-p2">P2M6</span><div class="qref-body"><div class="qref-name">Window Functions II</div><div class="qref-scope">LAG · LEAD · Running Totals</div></div></div>
+  <div class="qref-card"><span class="qref-code pc-p2">P2M7</span><div class="qref-body"><div class="qref-name">Data Wrangling</div><div class="qref-scope">DATE_TRUNC · EXTRACT · INTERVAL</div></div></div>
+  <div class="qref-card"><span class="qref-code pc-p2">P2M8</span><div class="qref-body"><div class="qref-name">Modularity & CTEs</div><div class="qref-scope">WITH · Chained CTEs · Views</div></div></div>
+  <div class="qref-card"><span class="qref-code pc-p3">P3M9</span><div class="qref-body"><div class="qref-name">DDL & DML</div><div class="qref-scope">CREATE · MERGE · upserts</div></div></div>
+  <div class="qref-card"><span class="qref-code pc-p3">P3M10</span><div class="qref-body"><div class="qref-name">Database Design</div><div class="qref-scope">ACID · 3NF · OLTP vs OLAP</div></div></div>
+  <div class="qref-card"><span class="qref-code pc-p3">P3M11</span><div class="qref-body"><div class="qref-name">Performance</div><div class="qref-scope">Indexes · EXPLAIN · Partitioning</div></div></div>
+  <div class="qref-card"><span class="qref-code pc-p3">P3M12</span><div class="qref-body"><div class="qref-name">Recursive CTEs</div><div class="qref-scope">WITH RECURSIVE · Tree Walking</div></div></div>
+</div>
+
+</div><!-- container -->
+
+<footer>SQL Interview Battle Plan · 3 Days · 12 Modules · College DB · Start tomorrow with <span style="font-family:'JetBrains Mono',monospace;color:var(--amber);">P1M1</span></footer>
+
+<script>
+function showDay(n){
+  document.querySelectorAll('.day-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.day-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('day'+n).classList.add('active');
+  document.querySelectorAll('.day-tab')[n-1].classList.add('active');
+}
+function showSchema(name){
+  document.querySelectorAll('.spanel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.stab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('sp-'+name).classList.add('active');
+  event.target.classList.add('active');
+}
+function toggleChk(item){
+  const cb=item.querySelector('input');
+  cb.checked=!cb.checked;
+  item.classList.toggle('done',cb.checked);
+}
+</script>
+</body>
+</html>
