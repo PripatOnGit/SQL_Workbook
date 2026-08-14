@@ -1,0 +1,86 @@
+Comprehensive Interview Guide: P1M4 — Subqueries & Conditional LogicThis reference guide consolidates all core concepts, mental models, decision frameworks, and solved practice problems from our P1M4 session. Use this guide to review before SQL interviews.1. Core Mental Models & MechanicsA. CASE WHENMechanics: Evaluates conditions sequentially from top to bottom. It returns the value for the first TRUE match and skips all subsequent conditions.Golden Rule: Always include an ELSE clause. If no condition matches and ELSE is omitted, SQL defaults unmatched rows to NULL.B. Scalar vs. Correlated Subqueries vs. EXISTSSubquery TypeExecution CountReturn ValuePrimary Use CaseScalar SubqueryRuns ONCE globally before outer query runs.Exactly 1 row, 1 column (single value).Comparing individual rows against a global benchmark (e.g., overall average GPA).Correlated SubqueryRuns ONCE PER ROW processed by the outer query.Dynamic output depending on outer row parameters.Category-specific comparisons (e.g., comparing a score against its course average).EXISTS / NOT EXISTSEvaluates per outer row using short-circuiting.Boolean (TRUE / FALSE).Semi-joins & Anti-joins checking for existence without duplicating rows.C. Critical Interview Gotchas & TrapsNOT IN vs NOT EXISTS with NULLs:If a subquery used inside NOT IN returns even a single NULL value, the entire NOT IN expression evaluates to UNKNOWN/empty set for all rows. Always prefer NOT EXISTS or explicitly filter WHERE col IS NOT NULL inside a NOT IN subquery.EXISTS Short-Circuit Execution:EXISTS stops scanning as soon as it finds the first matching row. Standard SQL convention uses SELECT 1 inside EXISTS because column values do not matter—only row existence matters.WHERE vs HAVING with Subqueries:Use WHERE when filtering individual row values against a subquery. Use HAVING when comparing a grouped aggregate (e.g., MAX(marks)) against a subquery.2. Decision Framework: Subquery vs. JOINDo you need columns from BOTH tables in your SELECT list?
+  │
+  ├── YES ──► Use JOIN (INNER, LEFT, RIGHT, FULL)
+  │
+  └── NO  ──► Are you comparing against ONE FIXED GLOBAL number?
+               │
+               ├── YES ──► Use a SCALAR SUBQUERY
+               │
+               └── NO  ──► Are you checking for EXISTENCE or comparing against a ROW-SPECIFIC calculation?
+                            │
+                            ├── Checking Existence ──► Use EXISTS / NOT EXISTS (Correlated)
+                            └── Row-Specific Calc ──► Use a CORRELATED SUBQUERY
+⚡ Golden Rule for Interviews: Subqueries in the WHERE clause act purely as filters. If you need to display attributes from Table B in your final result set, you MUST use a JOIN.3. Step-by-Step Solved Problem Sets--- SET 1: Foundational Practice ---Q1 (CASE WHEN)Problem: Categorize each student based on GPA: 'High' if gpa >= 3.7, 'Medium' if gpa >= 3.2, and 'Needs Improvement' otherwise. Order by gpa descending.Approach:Grain: One row per student.Logic: Construct sequential WHEN branches from highest to lowest threshold.Pitfalls Addressed: Missing FROM clause; typo in 'Median' instead of 'Medium'.Final SQL:SQLSELECT 
+    name, 
+    gpa,
+    CASE 
+        WHEN gpa >= 3.7 THEN 'High'
+        WHEN gpa >= 3.2 THEN 'Medium'
+        ELSE 'Needs Improvement'
+    END AS gpa_category
+FROM students
+ORDER BY gpa DESC;
+Q2 (Scalar Subquery)Problem: Find all students whose gpa is strictly above the average GPA of all students. Output student_id, name, gpa.Approach:Grain: One row per student who exceeds the global benchmark.Logic: (SELECT AVG(gpa) FROM students) returns a single number that runs once globally.Final SQL:SQLSELECT student_id, name, gpa
+FROM students
+WHERE gpa > (SELECT AVG(gpa) FROM students);
+Q3 (EXISTS - Basic)Problem: Find all students who have enrolled in at least one course using EXISTS. Return student_id, name, dept_id.Approach:Logic: EXISTS takes no column name before it. Link outer table students s to inner table enrollments e on s.student_id = e.student_id.Efficiency: No GROUP BY or COUNT needed inside EXISTS due to short-circuiting.Pitfalls Addressed: Writing WHERE student_id EXISTS IN (...) is invalid syntax. Use WHERE EXISTS (...).Final SQL:SQLSELECT s.student_id, s.name, s.dept_id
+FROM students s
+WHERE EXISTS (
+    SELECT 1 
+    FROM enrollments e 
+    WHERE e.student_id = s.student_id
+);
+Q4 (NOT EXISTS - Anti-Join)Problem: Find all departments (dept_id, dept_name) that currently have no students assigned to them. Use NOT EXISTS.Approach:Logic: Evaluates to TRUE for department rows that return zero rows in the subquery.NULL Safety: Safe against NULL values in dept_id.Final SQL:SQLSELECT d.dept_id, d.dept_name
+FROM departments d
+WHERE NOT EXISTS (
+    SELECT 1 
+    FROM students s
+    WHERE s.dept_id = d.dept_id
+);
+--- SET 2: Deep-Dive & Advanced Practice ---Q1 (Scalar Subquery + Aggregation Filter)Problem: Find all students who scored higher than the average marks across ALL enrollments in the entire college. Return student_id, name, and their maximum mark (max_marks). Group by student.Approach:Grain: One row per student (GROUP BY s.student_id, s.name).Tables Needed: students joined with enrollments to access both student names and marks.Filter Placement: Comparing a group aggregate (MAX(e.marks)) against a value must go in HAVING, not WHERE.Pitfalls Addressed: Trying to filter MAX() in WHERE; using e.avg(marks) instead of built-in AVG(marks).Final SQL:SQLSELECT 
+    s.student_id, 
+    s.name, 
+    MAX(e.marks) AS max_marks
+FROM students s
+JOIN enrollments e 
+    ON s.student_id = e.student_id
+GROUP BY 
+    s.student_id, 
+    s.name
+HAVING MAX(e.marks) > (SELECT AVG(marks) FROM enrollments);
+Q2 (Correlated Subquery - Row Comparison)Problem: Find all enrollments where a student scored higher than the average mark for that SPECIFIC course. Return student_id, course_id, and marks.Approach:Grain: One row per enrollment record.Table Choice: All required output columns exist inside enrollments. No self-JOIN in the main query is needed (self-joining on student_id causes fan-out!).Correlation: Inner query calculates AVG(e2.marks) where e2.course_id = e1.course_id.Pitfalls Addressed: Unnecessary self-join in outer query multiplying rows before filtering.Final SQL:SQLSELECT 
+    e1.student_id, 
+    e1.course_id, 
+    e1.marks
+FROM enrollments e1
+WHERE e1.marks > (
+    SELECT AVG(e2.marks) 
+    FROM enrollments e2 
+    WHERE e2.course_id = e1.course_id
+);
+Q3 (EXISTS with Conditional Subquery)Problem: Find all students who have at least one enrollment with a grade of 'A'. Use EXISTS. Return student_id and name.Approach:Grain: One row per student.Advantage over JOIN: EXISTS returns each student at most once, eliminating the need for DISTINCT or GROUP BY if a student has multiple 'A' grades.Final SQL:SQLSELECT student_id, name
+FROM students s
+WHERE EXISTS (
+    SELECT 1 
+    FROM enrollments e 
+    WHERE e.student_id = s.student_id 
+      AND e.grade = 'A'
+);
+Q4 (NOT EXISTS Anti-Join Pattern)Problem: Find all courses (course_id, course_name) that have NEVER been taken by any student. Use NOT EXISTS.Approach:Grain: One row per unassigned course.Logic: Selects courses where no matching record exists in enrollments.Final SQL:SQLSELECT c.course_id, c.course_name
+FROM courses c 
+WHERE NOT EXISTS (
+    SELECT 1 
+    FROM enrollments e 
+    WHERE e.course_id = c.course_id
+);
+Q5 (Multi-Level Correlated EXISTS)Problem: Find all students who have enrolled in at least one course offered by Department ID 1 (dept_id = 1). Use EXISTS joining enrollments and courses inside the subquery. Return student_id and name.Approach:Target: Identify students taking Dept 1 courses (regardless of the student's own department).Subquery Logic: Join enrollments e to courses c inside EXISTS, filtering for c.dept_id = 1 and correlating e.student_id = s.student_id.Pitfalls Addressed: Placing s.dept_id = 1 in the outer query filters students by their major, not by the course department they enrolled in.Final SQL:SQLSELECT s.student_id, s.name
+FROM students s
+WHERE EXISTS (
+    SELECT 1 
+    FROM enrollments e
+    JOIN courses c 
+        ON e.course_id = c.course_id
+    WHERE e.student_id = s.student_id 
+      AND c.dept_id = 1
+);
+4. Problem-Solving Protocol ChecklistWhen presented with any subquery question in an interview, run through this 4-step execution plan:Identify Target Grain: Determine what a single row of output represents (e.g., 1 row per student, 1 row per enrollment).Check Output Columns: Ask, "Do I need columns from Table B in my final output?"If Yes $\rightarrow$ Refactor to an INNER JOIN or LEFT JOIN.If No $\rightarrow$ Use EXISTS or a Subquery filter.Determine Correlation:Global benchmark comparison $\rightarrow$ Uncorrelated Scalar Subquery.Category/group benchmark comparison $\rightarrow$ Correlated Subquery (link outer row key to inner row key).Verify Null Safety & Aggregates:Use NOT EXISTS over NOT IN to protect against NULL values.Place group comparisons in HAVING and row comparisons in WHERE.
